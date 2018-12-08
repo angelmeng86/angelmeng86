@@ -1,0 +1,1045 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title>单片机开发遇到的坑和填坑办法</title>
+      <link href="/2018/02/09/%E5%8D%95%E7%89%87%E6%9C%BA%E5%BC%80%E5%8F%91%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91%E5%92%8C%E5%A1%AB%E5%9D%91%E5%8A%9E%E6%B3%95/"/>
+      <url>/2018/02/09/%E5%8D%95%E7%89%87%E6%9C%BA%E5%BC%80%E5%8F%91%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91%E5%92%8C%E5%A1%AB%E5%9D%91%E5%8A%9E%E6%B3%95/</url>
+      
+        <content type="html"><![CDATA[<p>一、IDE在线调试问题，点击调试遇到Fail to read registers，该问题有可能是设备当前运行的程序存在低功耗休眠的代码，导致芯片进入休眠状态无法调试，可以先暂时屏蔽低功耗代码进行相关工程代码的调试。 二、单片机时钟产生可以通过内部振荡器进行产生，也可以接入外部晶振，它们的区别在于：内部振荡器产生的时钟频率由于工艺问题会产生或多或少的偏差值，而外部晶振的误差非常小，但是会额外占用实际布板的面积；实际设计中需要根据具体需求进行选型。 三、调试技巧 1、波特率调试可以发送0x0a字符，然后使用示波器观察0101的电平跳变的周期，然后算出频率。 2、断点调试时，有可能会错过后续的中断；如串口接收数据时，断点在中断函数中，就会错过本次后续的中断信息及数据。 3、一条语句执行的耗时计算 1）在函数前将某一GPIO置高，函数执行完后将GPIO置低，通过示波器测量该IO的脉宽； 2）通过系统时钟计数器，函数执行前后对系统时钟进行计数采样，算出差值（注意时钟计数翻转问题），该方式精确度高。 四、当牵扯到DMA操作时，传入的地址必须是SRAM，而不能是其它如EFlash的地址，而且地址必须是对齐的；我之前在做证书认证时候为了节省内存资源，把EFlash的证书地址直接传入进行运算，发现在进行SM3运算时结果不对，最终定位到了上述DMA操作的情况，目前已解决。 五、在实际的两个ECU通信中，不管是串口通信还是SPI通信，都需要把两个ECU的GND接到一块，就是共地，不然会出现数据不一致的现象，谨记！ 六、根据所使用的单片机采用位宽进行赋值拷贝优化，可以有效减少处理数据的时钟周期。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 单片机 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>单片机开发基础概念篇</title>
+      <link href="/2018/02/09/%E5%8D%95%E7%89%87%E6%9C%BA%E5%BC%80%E5%8F%91%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5%E7%AF%87/"/>
+      <url>/2018/02/09/%E5%8D%95%E7%89%87%E6%9C%BA%E5%BC%80%E5%8F%91%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5%E7%AF%87/</url>
+      
+        <content type="html"><![CDATA[<p>一、SPI总线 SPI接口是Motorola 首先提出的全双工三线同步串行外围接口，采用主从模式（Master Slave）架构；支持多slave模式应用，一般仅支持单Master。 时钟由Master控制，在时钟移位脉冲下，数据按位传输，高位在前，低位在后（MSB first）；SPI接口有2根单向数据线，为全双工通信，目前应用中的数据速率可达几Mbps的水平。   一般应用4根信号线： MOSI：主器件数据输出，从器件数据输入 MISO：主器件数据输入，从器件数据输出 SCK：时钟信息，由主设备控制发出 SS：从设备选择信号，由主设备控制   根据时钟极性（CPOL）和相位（CPHA）组成4种工作模式： SPI0：CPOL=0,CPHA=0 SPI1：CPOL=0,CPHA=1 SPI2：CPOL=1,CPHA=0 SPI3：CPOL=1,CPHA=1 其中SPI0和SPI3为常用   二、QFP 方型扁平式封装技术（Plastic Quad Flat Package），该技术实现的CPU芯片引脚之间距离很小，管脚很细，一般大规模或超大规模集成电路采用这种封装形式，其引脚数一般都在100以上。该技术封装CPU时操作方便，可靠性高；而且其封装外形尺寸较小，寄生参数减小，适合高频应用；该技术主要适合用SMT表面安装技术在PCB上安装布线。   三、SRAM SRAM（静态随机存取存储器）不需要刷新电路即能保存它内部存储的数据。而DRAM（Dynamic Random Access Memory)每隔一段时间，要刷新充电一次，否则内部的数据即会消失，因此SRAM具有较高的性能，功耗较小，但是SRAM也有它的缺点，即它的集成度较低，相同容量的DRAM内存可以设计为较小的体积，但是SRAM却需要很大的体积。同样面积的硅片可以做出更大容量的DRAM，因此SRAM显得更贵。   四、I2C总线 I2C（Inter－Integrated Circuit）总线是由PHILIPS公司开发的两线式串行总线，用于连接微控制器及其外围设备。是微电子通信控制领域广泛采用的一种总线标准。它是同步通信的一种特殊形式，具有接口线少，控制方式简单，器件封装形式小，通信速率较高等优点。I2C 总线支持任何IC 生产工艺(CMOS、双极型）。通过串行数据（SDA）线和串行时钟 （SCL）线在连接到总线的器件间传递信息。每个器件都有一个唯一的地址识别（无论是微控制器——MCU、LCD 驱动器、存储器或键盘接口），而且都可以作为一个发送器或接收器（由器件的功能决定）。LCD 驱动器只能作为接收器，而存储器则既可以接收又可以发送数据。除了发送器和接收器外，器件在执行数据传输时也可以被看作是主机或从机（见表1）。主机是初始化总线的数据传输并产生允许传输的时钟信号的器件。此时，任何被寻址的器件都被认为是从机。 I2C总线（I2C bus，Inter-IC bus）是一个双向的两线连续总线，提供集成电路（ICs）之间的通信线路。I2C总线是一种串行扩展技术，最早由Philips公司推出，广泛应用于电视，录像机和音频设备。I2C总线的意思是“完成集成电路或功能单元之间信息交换的规范或协议”。Philips公司推出的I2C总线采用一条数据线（SDA），加一条时钟线（SCL）来完成数据的传输及外围器件的扩展；对各个节点的寻址是软寻址方式，节省了片选线，标准的寻址字节SLAM为7位，可以寻址127个单元。 I2C总线有三种数据传输速度：标准，快速模式和高速模式。标准的是100Kbps，快速模式为400Kbps，高速模式支持快至3.4Mbps的速度。所有的与次之传输速度的模式都是兼容的。I2C总线支持7位和10位地址空间设备和在不同电压下运行的设备。 五、DMA（直接存储器访问） DMA(Direct Memory Access，直接内存存取) 是所有现代电脑的重要特色，它允许不同速度的硬件装置来沟通，而不需要依赖于 CPU 的大量中断负载。否则，CPU 需要从来源把每一片段的资料复制到暂存器，然后把它们再次写回到新的地方。在这个时间中，CPU 对于其他的工作来说就无法使用。 一个完整的DMA传输过程必须经过DMA请求、DMA响应、DMA传输、DMA结束4个步骤。 DMA技术的出现，使得外围设备可以通过DMA控制器直接访问内存，与此同时，CPU可以继续执行程序．那么DMA控制器与CPU怎样分时使用内存呢?通常采用以下三种方法：(1)停止CPU访内存；(2)周期挪用；(3)DMA与CPU交替访问内存． 六、Watchdog 看门狗，又叫 watchdog timer，是一个定时器电路，一般有一个输入，叫喂狗，一个输出到MCU的RST端，MCU正常工作的时候，每隔一段时间输出一个信号到喂狗端，给 WDT 清零，如果超过规定时间不喂狗(一般在程序跑飞时)，WDT 定时超过，就会给出一个复位信号到MCU，使MCU复位。防止MCU死机. 看门狗的作用就是防止程序发生死循环或者说程序跑飞。 七、QFN QFN是一种无引脚封装，呈正方形或矩形，封装底部中央位置有一个大面积裸露焊盘用来导热，围绕大焊盘的封装外围四周有实现电气连结的导电焊盘。由于QFN封装不像传统的SOIC与TSOP封装那样具有鸥翼状引线，内部引脚与焊盘之间的导电路径短，自感系数以及封装体内布线电阻很低，所以它能提供卓越的电性能。此外，它还通过外露的引线框架焊盘提供了出色的散热性能，该焊盘具有直接散热通道，用于释放封装内的热量。通常将散热焊盘直接焊接在电路板上，并且PCB中的散热过孔有助于将多余的功耗扩散到铜接地板中，从而吸收多余的热量。 八、SCI、UART与RS232 SCI（Serial Communication Interface)意为“串行通信接口”，是相对于并行通信的，是串行通信技术的一种总称，最早由Motolora公司提出的。 UART（Universal Asynchronous Receiver &amp; Transmitter)即通用异步收发器，是串行通信的一种协议，它规定串行通信的波特率、起始/停止位、数据位、校验位等格式，以及各种异步握手信号。 RS232是串行通信的一种物理接口电气标准，规定传输介质（电缆）、收发电平等。其实，RS232、RS422、RS485等都是SCI，其中两线制（仅RXD和TXD）的RS232与RS422和RS485的通信协议是相同的（只有波特率、起始/停止位、数据位、校验位等参数），仅传输介质和收发电平不同</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 单片机 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>单片机开发遇到的经验总结（持续更新）</title>
+      <link href="/2017/06/22/%E5%8D%95%E7%89%87%E6%9C%BA%E5%BC%80%E5%8F%91%E9%81%87%E5%88%B0%E7%9A%84%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%EF%BC%89/"/>
+      <url>/2017/06/22/%E5%8D%95%E7%89%87%E6%9C%BA%E5%BC%80%E5%8F%91%E9%81%87%E5%88%B0%E7%9A%84%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<p>该文章记录自己在单片机开发调试过程中遇到的坑和解决办法；</p><h3 id="0x01-函数中声明大数组局部变量并初始化数据是一个非常耗时的操作，如果非要声明大数组，则声明时不进行初始化，根据需要进行部分初始化。"><a href="#0x01-函数中声明大数组局部变量并初始化数据是一个非常耗时的操作，如果非要声明大数组，则声明时不进行初始化，根据需要进行部分初始化。" class="headerlink" title="0x01 函数中声明大数组局部变量并初始化数据是一个非常耗时的操作，如果非要声明大数组，则声明时不进行初始化，根据需要进行部分初始化。"></a>0x01 函数中声明大数组局部变量并初始化数据是一个非常耗时的操作，如果非要声明大数组，则声明时不进行初始化，根据需要进行部分初始化。</h3><p>u8 data[2048] = {0};//该声明会导致单片机进行memset耗时操作 改为： u8 data[2048]; data[0]=0x00;//根据具体业务进行赋值操作  </p><h3 id="0x02-中断优先级很重要，在没有使用嵌套中断的情况下，当有两个中断同时触发时将会按照优先级处理优先级高的中断，如果刚处理完优先级高的中断，然后又来了个优先级高的中断，则会继续处理高优先级中断，这种情况下很有可能导致低优先级的中断迟迟不能触发，最后引起低优先级中断丢失的可能性；"><a href="#0x02-中断优先级很重要，在没有使用嵌套中断的情况下，当有两个中断同时触发时将会按照优先级处理优先级高的中断，如果刚处理完优先级高的中断，然后又来了个优先级高的中断，则会继续处理高优先级中断，这种情况下很有可能导致低优先级的中断迟迟不能触发，最后引起低优先级中断丢失的可能性；" class="headerlink" title="0x02 中断优先级很重要，在没有使用嵌套中断的情况下，当有两个中断同时触发时将会按照优先级处理优先级高的中断，如果刚处理完优先级高的中断，然后又来了个优先级高的中断，则会继续处理高优先级中断，这种情况下很有可能导致低优先级的中断迟迟不能触发，最后引起低优先级中断丢失的可能性；"></a>0x02 中断优先级很重要，在没有使用嵌套中断的情况下，当有两个中断同时触发时将会按照优先级处理优先级高的中断，如果刚处理完优先级高的中断，然后又来了个优先级高的中断，则会继续处理高优先级中断，这种情况下很有可能导致低优先级的中断迟迟不能触发，最后引起低优先级中断丢失的可能性；</h3>]]></content>
+      
+      
+      <categories>
+          
+          <category> 单片机 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>iOS苹果应用上架（五）Xcode工程配置及打包上传</title>
+      <link href="/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%BA%94%EF%BC%89Xcode%E5%B7%A5%E7%A8%8B%E9%85%8D%E7%BD%AE%E5%8F%8A%E6%89%93%E5%8C%85%E4%B8%8A%E4%BC%A0/"/>
+      <url>/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%BA%94%EF%BC%89Xcode%E5%B7%A5%E7%A8%8B%E9%85%8D%E7%BD%AE%E5%8F%8A%E6%89%93%E5%8C%85%E4%B8%8A%E4%BC%A0/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-打开Xcode代码工程，操作如下"><a href="#0x01-打开Xcode代码工程，操作如下" class="headerlink" title="0x01 打开Xcode代码工程，操作如下"></a>0x01 打开Xcode代码工程，操作如下</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-154128.png" alt="WX20170614-154128"></p><h2 id="0x02-取消签名自动管理功能，选择之前安装好的Provision文件，另外可以需要设置应用的版本号Version和Build信息，如1-0"><a href="#0x02-取消签名自动管理功能，选择之前安装好的Provision文件，另外可以需要设置应用的版本号Version和Build信息，如1-0" class="headerlink" title="0x02 取消签名自动管理功能，选择之前安装好的Provision文件，另外可以需要设置应用的版本号Version和Build信息，如1.0"></a>0x02 取消签名自动管理功能，选择之前安装好的Provision文件，另外可以需要设置应用的版本号Version和Build信息，如1.0<img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-154311.png" alt="WX20170614-154311"></h2><h2 id="0x03-点击选择，配置工程为真机编译选项"><a href="#0x03-点击选择，配置工程为真机编译选项" class="headerlink" title="0x03 点击选择，配置工程为真机编译选项"></a>0x03 点击选择，配置工程为真机编译选项<img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-154504.png" alt="WX20170614-154504"></h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/屏幕快照-2017-06-14-下午3.44.00.png" alt="屏幕快照 2017-06-14 下午3.44.00"></p><h2 id="0x04-然后开始进行打包操作"><a href="#0x04-然后开始进行打包操作" class="headerlink" title="0x04 然后开始进行打包操作"></a>0x04 然后开始进行打包操作</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/屏幕快照-2017-06-14-下午3.45.21.png" alt="屏幕快照 2017-06-14 下午3.45.21"></p><h2 id="0x05-编译成功的话，会弹出下框，选择打包好的版本，然后点击上传苹果商店"><a href="#0x05-编译成功的话，会弹出下框，选择打包好的版本，然后点击上传苹果商店" class="headerlink" title="0x05 编译成功的话，会弹出下框，选择打包好的版本，然后点击上传苹果商店"></a>0x05 编译成功的话，会弹出下框，选择打包好的版本，然后点击上传苹果商店</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-155555.png" alt="WX20170614-155555"></p><h2 id="0x06-选择对应的苹果账号，点击Choose"><a href="#0x06-选择对应的苹果账号，点击Choose" class="headerlink" title="0x06 选择对应的苹果账号，点击Choose"></a>0x06 选择对应的苹果账号，点击Choose</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-155708.png" alt="WX20170614-155708"></p><h2 id="0x07-接着网络畅通的话会显示如下信息，继续点击Upload"><a href="#0x07-接着网络畅通的话会显示如下信息，继续点击Upload" class="headerlink" title="0x07 接着网络畅通的话会显示如下信息，继续点击Upload"></a>0x07 接着网络畅通的话会显示如下信息，继续点击Upload</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-155732.png" alt="WX20170614-155732"></p><h2 id="0x08-如果你幸运的话，会看到如下结果，恭喜你上传版本成功。否则有可能网络或者APP包等其它原因弹出错误。"><a href="#0x08-如果你幸运的话，会看到如下结果，恭喜你上传版本成功。否则有可能网络或者APP包等其它原因弹出错误。" class="headerlink" title="0x08 如果你幸运的话，会看到如下结果，恭喜你上传版本成功。否则有可能网络或者APP包等其它原因弹出错误。"></a>0x08 如果你幸运的话，会看到如下结果，恭喜你上传版本成功。否则有可能网络或者APP包等其它原因弹出错误。</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-155912.png" alt="WX20170614-155912"></p><h2 id="0x09-上传的应用会在iTunes-Connect里面看到构建版本"><a href="#0x09-上传的应用会在iTunes-Connect里面看到构建版本" class="headerlink" title="0x09 上传的应用会在iTunes Connect里面看到构建版本"></a>0x09 上传的应用会在iTunes Connect里面看到构建版本</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-162830.png" alt="WX20170614-162830"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS苹果应用上架（四）在iTunes Connect中创建苹果应用</title>
+      <link href="/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E5%9B%9B%EF%BC%89%E5%9C%A8iTunes%20Connect%E4%B8%AD%E5%88%9B%E5%BB%BA%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8/"/>
+      <url>/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E5%9B%9B%EF%BC%89%E5%9C%A8iTunes%20Connect%E4%B8%AD%E5%88%9B%E5%BB%BA%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-继续登录官方开发者网站，点击进入iTunes-Connect"><a href="#0x01-继续登录官方开发者网站，点击进入iTunes-Connect" class="headerlink" title="0x01 继续登录官方开发者网站，点击进入iTunes Connect"></a>0x01 继续登录官方开发者网站，点击进入iTunes Connect<img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-142606.png" alt="WX20170614-142606"></h2><h2 id="0x02-点击进入我的App"><a href="#0x02-点击进入我的App" class="headerlink" title="0x02 点击进入我的App"></a>0x02 点击进入我的App</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-161004.png" alt="WX20170614-161004"></p><h2 id="0x03-点击-号新建App"><a href="#0x03-点击-号新建App" class="headerlink" title="0x03 点击+号新建App"></a>0x03 点击+号新建App</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-154927.png" alt="WX20170614-154927"></p><h2 id="0x04-如下图，填写并创建APP"><a href="#0x04-如下图，填写并创建APP" class="headerlink" title="0x04 如下图，填写并创建APP"></a>0x04 如下图，填写并创建APP</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-155214.png" alt="WX20170614-155214"></p><h2 id="0x05-已经能够看到创建好的APP，可以点击进入编辑信息"><a href="#0x05-已经能够看到创建好的APP，可以点击进入编辑信息" class="headerlink" title="0x05 已经能够看到创建好的APP，可以点击进入编辑信息"></a>0x05 已经能够看到创建好的APP，可以点击进入编辑信息</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-155308.png" alt="WX20170614-155308"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS苹果应用上架（三）根据APP包名创建Provision文件</title>
+      <link href="/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%B8%89%EF%BC%89%E6%A0%B9%E6%8D%AEAPP%E5%8C%85%E5%90%8D%E5%88%9B%E5%BB%BAProvision%E6%96%87%E4%BB%B6/"/>
+      <url>/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%B8%89%EF%BC%89%E6%A0%B9%E6%8D%AEAPP%E5%8C%85%E5%90%8D%E5%88%9B%E5%BB%BAProvision%E6%96%87%E4%BB%B6/</url>
+      
+        <content type="html"><![CDATA[<p>Provision文件用于打包指定APP包名的应用。</p><h2 id="0x01-接上一节，登录官方开发网，进入证书、ID及配置文件管理界面，点击Provisioning-Profiles下的Distribution菜单，然后再点击右上角-号。"><a href="#0x01-接上一节，登录官方开发网，进入证书、ID及配置文件管理界面，点击Provisioning-Profiles下的Distribution菜单，然后再点击右上角-号。" class="headerlink" title="0x01 接上一节，登录官方开发网，进入证书、ID及配置文件管理界面，点击Provisioning Profiles下的Distribution菜单，然后再点击右上角+号。"></a>0x01 接上一节，登录官方开发网，进入证书、ID及配置文件管理界面，点击Provisioning Profiles下的Distribution菜单，然后再点击右上角+号。</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143423.png" alt="WX20170614-143423"></p><h2 id="0x02-选择Distribution下AppStore选项，然后继续"><a href="#0x02-选择Distribution下AppStore选项，然后继续" class="headerlink" title="0x02 选择Distribution下AppStore选项，然后继续"></a>0x02 选择Distribution下AppStore选项，然后继续</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143636.png" alt="WX20170614-143636"></p><h2 id="0x03-选择上一节创建好的APP-ID包名"><a href="#0x03-选择上一节创建好的APP-ID包名" class="headerlink" title="0x03 选择上一节创建好的APP ID包名"></a>0x03 选择上一节创建好的APP ID包名</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143719.png" alt="WX20170614-143719"></p><h2 id="0x04-选择第一节创建的开发者证书"><a href="#0x04-选择第一节创建的开发者证书" class="headerlink" title="0x04 选择第一节创建的开发者证书"></a>0x04 选择第一节创建的开发者证书</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143844.png" alt="WX20170614-143844"></p><h2 id="0x05-输入个Provision文件名"><a href="#0x05-输入个Provision文件名" class="headerlink" title="0x05 输入个Provision文件名"></a>0x05 输入个Provision文件名</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143916.png" alt="WX20170614-143916"></p><h2 id="0x06-见下图，Provision文件创建完成"><a href="#0x06-见下图，Provision文件创建完成" class="headerlink" title="0x06 见下图，Provision文件创建完成"></a>0x06 见下图，Provision文件创建完成<img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-144014.png" alt="WX20170614-144014"></h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS苹果应用上架（二）创建APP包名</title>
+      <link href="/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%BA%8C%EF%BC%89%E5%88%9B%E5%BB%BAAPP%E5%8C%85%E5%90%8D/"/>
+      <url>/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%BA%8C%EF%BC%89%E5%88%9B%E5%BB%BAAPP%E5%8C%85%E5%90%8D/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-登录https-developer-apple-com网站，点击进入证书、ID及配置管理菜单"><a href="#0x01-登录https-developer-apple-com网站，点击进入证书、ID及配置管理菜单" class="headerlink" title="0x01 登录https://developer.apple.com网站，点击进入证书、ID及配置管理菜单"></a>0x01 登录<a href="https://developer.apple.com" target="_blank" rel="noopener">https://developer.apple.com</a>网站，点击进入证书、ID及配置管理菜单</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-142543.png" alt="WX20170614-142543"></p><h2 id="0x02-选择App-ID选项，点击右上角-号增加应用包名"><a href="#0x02-选择App-ID选项，点击右上角-号增加应用包名" class="headerlink" title="0x02 选择App ID选项，点击右上角+号增加应用包名"></a>0x02 选择App ID选项，点击右上角+号增加应用包名</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-142801.png" alt="WX20170614-142801"></p><h2 id="0x03-描述见下图"><a href="#0x03-描述见下图" class="headerlink" title="0x03 描述见下图"></a>0x03 描述见下图</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143129.png" alt="WX20170614-143129"> <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143225.png" alt="WX20170614-143225"></p><h2 id="0x04-点击注册按钮，完成应用包名创建"><a href="#0x04-点击注册按钮，完成应用包名创建" class="headerlink" title="0x04 点击注册按钮，完成应用包名创建"></a>0x04 点击注册按钮，完成应用包名创建</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-143248.png" alt="WX20170614-143248"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS苹果应用上架（一）创建发布者证书</title>
+      <link href="/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%B8%80%EF%BC%89%E5%88%9B%E5%BB%BA%E5%8F%91%E5%B8%83%E8%80%85%E8%AF%81%E4%B9%A6/"/>
+      <url>/2017/06/14/iOS%E8%8B%B9%E6%9E%9C%E5%BA%94%E7%94%A8%E4%B8%8A%E6%9E%B6%EF%BC%88%E4%B8%80%EF%BC%89%E5%88%9B%E5%BB%BA%E5%8F%91%E5%B8%83%E8%80%85%E8%AF%81%E4%B9%A6/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-打开Xcode工具，进入下图菜单"><a href="#0x01-打开Xcode工具，进入下图菜单" class="headerlink" title="0x01 打开Xcode工具，进入下图菜单"></a>0x01 打开Xcode工具，进入下图菜单</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/屏幕快照-2017-06-14-下午2.14.36.png" alt="屏幕快照 2017-06-14 下午2.14.36"></p><h2 id="0x02-选择Account选项卡"><a href="#0x02-选择Account选项卡" class="headerlink" title="0x02 选择Account选项卡"></a>0x02 选择Account选项卡</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-141643.png" alt="WX20170614-141643"></p><h2 id="0x03-点击右下角-号，Add-Apple-ID增加苹果账号"><a href="#0x03-点击右下角-号，Add-Apple-ID增加苹果账号" class="headerlink" title="0x03 点击右下角+号，Add Apple ID增加苹果账号"></a>0x03 点击右下角+号，Add Apple ID增加苹果账号</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/屏幕快照-2017-06-14-下午2.16.59.png" alt="屏幕快照 2017-06-14 下午2.16.59"></p><h2 id="0x04-输入自己的申请好的苹果账号和密码，Sign-In"><a href="#0x04-输入自己的申请好的苹果账号和密码，Sign-In" class="headerlink" title="0x04 输入自己的申请好的苹果账号和密码，Sign In"></a>0x04 输入自己的申请好的苹果账号和密码，Sign In</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/屏幕快照-2017-06-14-下午2.18.14.png" alt="屏幕快照 2017-06-14 下午2.18.14"></p><h2 id="0x05-选择已登录的账号，然后点击View-Details"><a href="#0x05-选择已登录的账号，然后点击View-Details" class="headerlink" title="0x05 选择已登录的账号，然后点击View Details"></a>0x05 选择已登录的账号，然后点击View Details</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-142038.png" alt="WX20170614-142038"></p><h2 id="0x06-如果电脑中没有发布者证书，则红色箭头处会有一个Create按钮，点击该按钮进行iOS发布者证书创建"><a href="#0x06-如果电脑中没有发布者证书，则红色箭头处会有一个Create按钮，点击该按钮进行iOS发布者证书创建" class="headerlink" title="0x06 如果电脑中没有发布者证书，则红色箭头处会有一个Create按钮，点击该按钮进行iOS发布者证书创建"></a>0x06 如果电脑中没有发布者证书，则红色箭头处会有一个Create按钮，点击该按钮进行iOS发布者证书创建</h2><p><img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-142247.png" alt="WX20170614-142247"></p><h2 id="0x07-创建成功的话，在钥匙串应用中能够看见如下证书信息"><a href="#0x07-创建成功的话，在钥匙串应用中能够看见如下证书信息" class="headerlink" title="0x07 创建成功的话，在钥匙串应用中能够看见如下证书信息"></a>0x07 创建成功的话，在钥匙串应用中能够看见如下证书信息<img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/06/WX20170614-142330.png" alt="WX20170614-142330"></h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>各类总线传输速率（转）</title>
+      <link href="/2017/04/18/%E5%90%84%E7%B1%BB%E6%80%BB%E7%BA%BF%E4%BC%A0%E8%BE%93%E9%80%9F%E7%8E%87%EF%BC%88%E8%BD%AC%EF%BC%89/"/>
+      <url>/2017/04/18/%E5%90%84%E7%B1%BB%E6%80%BB%E7%BA%BF%E4%BC%A0%E8%BE%93%E9%80%9F%E7%8E%87%EF%BC%88%E8%BD%AC%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<ol><li>USB总线</li></ol><p>USB1.1： ——-低速模式(low speed)：1.5Mbps ——-全速模式(full speed)： 12Mbps USB2.0：向下兼容。增加了高速模式，最大速率480Mbps。 ——-高速模式(high speed)： 25~480Mbps USB3.0：向下兼容。 ——-super speed ：理论上最高达4.8Gbps，实际中，也就是high speed 的10倍左右。  </p><ol start="2"><li>UART</li></ol><p>RS232：传输速率一般不超过20Kbps，速率低，抗干扰能力差，RS-232C能传输的最大距离不超过15m（50英尺）。   RS422：定义了一种平衡通信接口，将传输速率提高到10Mbps，传输距离延长到4000英尺（速率低于100Kbps时），并允许在一条平衡总线上连接最多10个接收器。RS-422是一种单机发送、多机接收的单向、平衡传输规范，被命名为TIA/EIA-422-A标准。   RS485：增加了多点、双向通信能力，即允许多个发送器连接到同一条总线上，同时增加了发送器的驱动能力和冲突保护特性，扩展了总线共模范围，后命名为TIA/EIA-485-A标准。最高传输速率10Mbps，抗干扰能力强，可以传距离1.5km。   平衡双绞线的长度与传输速率成反比，在100Kbps速率以下，才可能使用规定最长的电缆长度。只有在很短的距离下才能获得最高速率传输。一般100米长双绞线最大传输速率仅为1Mbps。  </p><ol start="3"><li>SPI总线</li></ol><p>全双工通信，传输速率可达几Mbps水平，比I2C快。  </p><ol start="4"><li>I2C总线：　半双工，只有2根线。数据线和时钟线。</li></ol><p>——–标准速度：100kbps ——–快速模式：400kbps ——–高速模式：3.4Mbps  </p><ol start="4"><li>Ethernet，也就是通常的网速。</li></ol><p>——–早期的以太网传输速率只有10Mbps。 ——–百兆网：理论上最大100Mbps。 ——–千兆网：理论上最大1Gbps。  </p><ol start="5"><li>SD总线：最高能达10Mbps。</li></ol><ol start="6"><li>SATA接口：</li></ol><p>——–SATA1.0：理论传输速度是150MB/s（或者1.5Gb/s），实际也就30MBps。 ——–SATA2.0： 300MBps，即3Gbps。实际也就80MBps。 ——–SATA3.0： 600MBps，即6Gbps。 ——–eSATA：理论传输速度可达到1.5Gbps或3Gbps。  </p><ol start="7"><li>PCI总线</li></ol><p>——–PCI：32位，33MHz时钟频率，速率是33*4 = 133MBps，即1Gbps。 ——– PCI 2.1：64位，66MHz时钟频率来说：速率是66*8 = 528MBps，即4Gbps。  </p><ol start="8"><li>PCI-e：</li></ol><p>PCI Express 总线频率 2500 MHz，这是在 100 MHz 的基准频率通过锁相环振荡器(Phase Lock Loop，PLL)达到的。 串行总线带宽(MB/s) = 串行总线时钟频率(MHz) <em> 串行总线位宽(bit/8 = B) </em> 串行总线管线 <em> 编码方式 </em> 每时钟传输几组数据(cycle) ——PCI Express x1 总线位宽是 1位，总线频率 2500 MHz，串行总线管线是 1 条，每时钟传输 2组数据，编码方式为 8b/10b，它的带宽为 476.84 MB/s，即 3814.7 Mbps。（带宽是 PCI 的 3.75 倍。） 公式是 2500000000(Hz) <em> 1/8(bit) </em> 1(条管线) <em> 8/10(bit) </em> 2(每时钟传输2组数据) = 500000000 B/s = 476.8371582 MB/s，即 3814.6972656 Mbps。 下面给出其它类型组合的带宽。 ——PCI Express x2 的带宽为 953.68 MB/s，即 7629.4 Mbps。（此模式仅用于主板内部接口而非插槽模式） ——PCI Express x4 的带宽为 1907.36 MB/s，即 15258.9 Mbps。 ——PCI Express x8 的带宽为 3814.72 MB/s，即 30517.8 Mbps。 ——PCI Express x16 的带宽为 7629.44 MB/s，即 61035.5 Mbps。（带宽是 AGP 8X 的 3.75 倍。） ——PCI Express x32 的带宽为 15258.88 MB/s，即 122071 Mbps。</p><ol start="9"><li>XGMII/XLGMII/CGMII</li></ol><p>在以太网标准中，MAC层与PHY层之间的10Gbps/40Gbps/100Gbps速率等级所对应的接口分别为XGMII/XLGMII/CGMII，由于XGMII/XLGMII是并行总线，而且采用的是单端信号，HSTL电平，最大传输距离只有7cm。所以在实际应用中，XGMII/XLGMII基本上被XAUI/XLAUI替代。XAUI/XLAUI是四通道串行总线，采用的差分信号，CML逻辑传输，并且进行了扰码，大大增强了信号的抗扰性能，使得信号的有效传输距离增加到50cm。 XAUI/XLAUI在物理结构上是一样的，收发通道独立，各四对差分信号线。对于XAUI总线，每对差分线上的数据速率为3.125Gbps，总数据带宽为12.5Gbps，有效带宽为12.5Gbps*0.8=10Gbps （因为XAUI总线数据在传输前进行了8B/10B变换，编码效率为80%）。   对于XLAUI总线，每对差分线上的数据速率为10.3125Gbps，总数据带宽为41.25Gbps，有效带宽为41.25Gbps*(64/66)=40Gbps（因为XLAUI总线数据在传输前进行了64B/66B变换，编码效率为96.97%）。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 单片机 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>在Mac OS上编译 SQLCipher</title>
+      <link href="/2017/03/31/%E5%9C%A8Mac%20OS%E4%B8%8A%E7%BC%96%E8%AF%91%20SQLCipher/"/>
+      <url>/2017/03/31/%E5%9C%A8Mac%20OS%E4%B8%8A%E7%BC%96%E8%AF%91%20SQLCipher/</url>
+      
+        <content type="html"><![CDATA[<p>在sqlcipher官网给的方法没法在Mac OS上编译，所以做了以下记录，大家应该明白编译这东西是为了进行加密数据库的脱密或者加密。 ./configure –enable-load-extension –enable-tempstore=yes –with-crypto-lib=commoncrypto CFLAGS=”-DSQLITE_HAS_CODEC -DSQLITE_ENABLE_FTS3” LDFLAGS=”/System/Library/Frameworks/Security.framework/Versions/Current/Security” make</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mac os </tag>
+            
+            <tag> sqlcipher </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>单片机下的编码规范</title>
+      <link href="/2017/03/06/%E5%8D%95%E7%89%87%E6%9C%BA%E4%B8%8B%E7%9A%84%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/"/>
+      <url>/2017/03/06/%E5%8D%95%E7%89%87%E6%9C%BA%E4%B8%8B%E7%9A%84%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/</url>
+      
+        <content type="html"><![CDATA[<h2 id="1。模块描述"><a href="#1。模块描述" class="headerlink" title="1。模块描述"></a>1。模块描述</h2><p>模块是为了实现某一功能的函数的集合，文件名使用缺省的后缀，在每一模块的开头应有如下的描述体： /****************************************************************************** *** * PROJECT CODE ：项目代号或名称 <em> </em> CREATE DATE ：创建日期 <em> </em> CREATED BY ：创建人 <em> </em> FUNCTION ：模块功能 <em> </em> MODIFY DATE ：修改日期 <em> </em> DOCUMENT ：参考文档 <em> </em> OTHERS ：程序员认为应做特别说明的部分，如特别的编译开关 <em> <strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><em>**</em></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></em>/ 不同的修改人应在修改的地方加上适当的注释，包括修改人的姓名。另外，如有必要，要注明模块的工作平台，如单板OS、DOS、WINDOWS 等。注明适用的编译器和编译模式。</p><h2 id="2。函数描述"><a href="#2。函数描述" class="headerlink" title="2。函数描述"></a>2。函数描述</h2><p>函数是组成模块的单元，一般用来完成某一算法或控制等。在每一函数的开头应有如下的描述体： /****************************************************************************** *** * FUNCTION NAME：函数名称 <em> </em> CREATE DATE ：创建日期 <em> </em> CREATED BY ：创建人 <em> </em> FUNCTION ：函数功能 <em> </em> MODIFY DATE ：修改日期 <em> </em> INPUT ：输入参数类型(逐个说明) <em> </em> OUTPUT ：输出参数类型(逐个说明) <em> </em> RETURN ：返回信息 <em> <strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><em>**</em></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></em>/ 可选的描述有： <em> RECEIVED MESSAGES：收到的消息 </em> <em> SENT MESSAGES ：发送的消息 </em> <em> DATABASE ACCESS ：存取的数据库 </em> <em> CALLED BY ：该函数的调用者 </em> <em> PROCEDURES CALLED：调用的过程 </em> <em> RECEVED PRIMITIVES : 收到的原语 </em> <em> SENT PRIMITIVES : 发送的原语 </em> 及其它程序员认为应有的描述。标题可以只大写第一个字母。例如：Function Name：</p><h2 id="3。命名规则："><a href="#3。命名规则：" class="headerlink" title="3。命名规则："></a>3。命名规则：</h2><p>A) 函数： 函数名应能体现该函数完成的功能，关键部分应采用完整的单词，辅助部分若太长可采用缩写，缩写应符合英文的规范。每个单词的第一个字母大写。如：ShowPoints，CtrlDestBoard，SendResetMsg 等。 B) 变量： 变量的命名规则部分采用匈牙利命名规则(鼓励完全使用匈牙利名规则)。变量的第一个或前两个字母小写，表示其数据类型，其后每个词的第一个字母大写。推荐的类型前缀如下： <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/03/规范.png" alt="规范"> 如iCurrentValue，uTransitionCount 等。对于其他复合类型或自定义类型，请用适当的前缀来表示。除局部循环变量外，不鼓励单个字母的变量名。 对于常用的类型定义，尽量使用WORD、BOOL、LPWORD、VOID、FAR、NEAR 等惯用写法，避免使用char、long、void、far、near 等小写格式。</p><h2 id="4。书写风格："><a href="#4。书写风格：" class="headerlink" title="4。书写风格："></a>4。书写风格：</h2><p>A) 函数：函数的返回类型一定要写，不管它是否默认类型，函数的参数之间应用一逗 号加一空格隔开,若有多个参数，应排列整齐。例如： int SendResetMsg( PTLAPENTITY pLAPEntity, int iErrorNo ) { int iTempValue; . . . } 函数的类型和上下两个括号应从第一列开始，函数的第一行应缩进一个TAB，不得用空格缩进。(按大多数程序范例，TAB 为四个字符宽，我们规定：TAB 为四个字符宽。) B) 语句：循环语句和if 语句等块语句的第一个大括号‘{’可跟在第一行的后面，接 下来的语句应缩进一个TAB，如： for ( count = 0 ; count &lt; MAXLINE ; count++ ) { if ( (count % PAGELINE) == 0 ) { . . . } . . } 也可另起一行，如： for ( count = 0 ; count &lt; MAXLINE ; count++ ) { if ( (count % PAGELINE) == 0 ) { . . . } . . } 两种写法在世界著名的程序员手下均可见到，我们尊重个人的习惯，但推荐使用后一种写法。复杂表达式(两个运算符以上，含两个)必须用括号区分运算顺序，运算符的前后应各有一空格，习惯写在一行的几个语句(如IF 语句)，中间应有一空格，其它语句不鼓励写在同一行。 空格加在适当的地方，如 if ( ; for ( ; ) {; 语句的上下对齐也可使程序便于阅读，如： myStruct.iFirstNumber = 0; myStruct.lSecondNumber = 1; myStruct.pThePoint = NULL; C) 常量：常量一般情况下可用宏定义，用大写的方式，单词之间用下划线隔开 如： #define MAX_LINE 100 #define PI 3.1415926 不鼓励在程序中出现大量的数字常数。 注：对于一些有必要说明的缩写，可以在模块描述内加以说明。</p><h2 id="5。头文件："><a href="#5。头文件：" class="headerlink" title="5。头文件："></a>5。头文件：</h2><p>头文件一般包括了数据结构的定义，函数原形的说明，宏定义等，不许包含函数体和变量实体，文件名使用缺省的后缀.h，不使用类似.DEF 等非标准的后缀名，头文件的开始可包括如下的注释： /<strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><em>**</em></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong> <em> CREATE DATE：创建日期 </em> <em> CREATED BY ：创建人 </em> <em> MODIFIED BY ：修改人 </em> <em> USED BY ：由哪些模块使用 </em> <strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong>*</strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong>/ 为了避免重编译，应加上条件编译语句，如文件headfille.h 应包含下列语句： #ifndef __HEADFILE_H #define __HEADFILE_H . . . #endif</p><h2 id="6。注释："><a href="#6。注释：" class="headerlink" title="6。注释："></a>6。注释：</h2><p>注释是源码中非常重要的部分，不应少于源码行数的15%，我们希望能达到25%或更多。注释用中英文都可以，但应易读易懂。不要在一个语句的中间插入注释。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 单片机 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>Centos Linux下部署Parse服务器</title>
+      <link href="/2017/03/05/Centos%20Linux%E4%B8%8B%E9%83%A8%E7%BD%B2Parse%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
+      <url>/2017/03/05/Centos%20Linux%E4%B8%8B%E9%83%A8%E7%BD%B2Parse%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>Parse是Facebook很有名的一个项目，能够帮助目前很多应用快速搭建平台快速开发，官网目前已经关闭，并在github提供开源，很好的一个东西。</p><h2 id="0x01-环境要求"><a href="#0x01-环境要求" class="headerlink" title="0x01 环境要求"></a>0x01 环境要求</h2><h3 id="1、MongoDB数据库"><a href="#1、MongoDB数据库" class="headerlink" title="1、MongoDB数据库"></a>1、MongoDB数据库</h3><p>1）下载命令如下：<br>curl -O <a href="https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.2.tgz" target="_blank" rel="noopener">https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.2.tgz</a> </p><p>tar -xvf mongodb-linux-x86_64-3.4.2.tgz 2）移动目录，配置环境变量： mv mongodb-linux-x86_64-3.4.2 /opt/mongodb</p><p>export PATH=<mongodb-install-directory>/bin:$PATH </mongodb-install-directory></p><p>我的<mongodb-install-directory>就是/opt/mongodb</mongodb-install-directory></p><p>3）创建数据库目录：<br>mkdir -p /data/db</p><p>/data/db 是 MongoDB 默认的启动的数据库路径(–dbpath)</p><p>4）执行mongod命令启动数据库</p><h3 id="2、Nodejs"><a href="#2、Nodejs" class="headerlink" title="2、Nodejs"></a>2、Nodejs</h3><pre><code>curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -yum -y install nodejsyum install gcc-c++ make</code></pre><p><a href="https://github.com/ParsePlatform/docs" target="_blank" rel="noopener"> https://github.com/ParsePlatform/docs</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 服务端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> parse </tag>
+            
+            <tag> saas </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Linux下Gitblit的安装</title>
+      <link href="/2017/03/05/Linux%E4%B8%8BGitblit%E7%9A%84%E5%AE%89%E8%A3%85/"/>
+      <url>/2017/03/05/Linux%E4%B8%8BGitblit%E7%9A%84%E5%AE%89%E8%A3%85/</url>
+      
+        <content type="html"><![CDATA[<p>直接进入正题（下列操作都是以root用户执行）：</p><h3 id="1、去官网下载gitblit-1-8-0-tar-gz，我使用的是Go语言版本；"><a href="#1、去官网下载gitblit-1-8-0-tar-gz，我使用的是Go语言版本；" class="headerlink" title="1、去官网下载gitblit-1.8.0.tar.gz，我使用的是Go语言版本；"></a>1、去官网下载gitblit-1.8.0.tar.gz，我使用的是Go语言版本；</h3><h3 id="2、解压下载包"><a href="#2、解压下载包" class="headerlink" title="2、解压下载包"></a>2、解压下载包</h3><p>tar -xvf gitblit-1.8.0.tar.gz</p><h3 id="3、把解压的目录移动并改名"><a href="#3、把解压的目录移动并改名" class="headerlink" title="3、把解压的目录移动并改名"></a>3、把解压的目录移动并改名</h3><p>mv gitblit-1.8.0 /opt/gitblit</p><h3 id="4、编辑配置文件"><a href="#4、编辑配置文件" class="headerlink" title="4、编辑配置文件"></a>4、编辑配置文件</h3><p>vim /opt/gitblit/data/defaults.properties 我们只需要关注server.httpPort和server.httpsPort，就是访问的Web端口</p><h3 id="5、配置完成后可以执行脚本，初始化数据"><a href="#5、配置完成后可以执行脚本，初始化数据" class="headerlink" title="5、配置完成后可以执行脚本，初始化数据"></a>5、配置完成后可以执行脚本，初始化数据</h3><p>cd /opt/gitblit/ ./gitblit.sh 通过浏览器能够正常访问gitblit，这一步已经完成了基本部署。</p><h3 id="6、配置为服务，我使用的是Centos系统，执行如下"><a href="#6、配置为服务，我使用的是Centos系统，执行如下" class="headerlink" title="6、配置为服务，我使用的是Centos系统，执行如下"></a>6、配置为服务，我使用的是Centos系统，执行如下</h3><p>cd /opt/gitblit ./install-service-centos.sh</p><h3 id="7、启动服务"><a href="#7、启动服务" class="headerlink" title="7、启动服务"></a>7、启动服务</h3><p>service gitblit start 大功告成，谢谢。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> gitblit </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>ionic下native触发js事件</title>
+      <link href="/2017/02/21/ionic%E4%B8%8Bnative%E8%A7%A6%E5%8F%91js%E4%BA%8B%E4%BB%B6/"/>
+      <url>/2017/02/21/ionic%E4%B8%8Bnative%E8%A7%A6%E5%8F%91js%E4%BA%8B%E4%BB%B6/</url>
+      
+        <content type="html"><![CDATA[<p>说明一下本地层回调js事件的应用场景，推送、后台任务提醒、即时通讯等等；</p><h2 id="一、在www-js-app-js中增加如下回调函数："><a href="#一、在www-js-app-js中增加如下回调函数：" class="headerlink" title="一、在www/js/app.js中增加如下回调函数："></a>一、在www/js/app.js中增加如下回调函数：</h2><p>$ionicPlatform.ready(function() {<br>     if (window.cordova &amp;&amp; window.cordova.plugins &amp;&amp; window.cordova.plugins.Keyboard) {<br>         cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);<br>         cordova.plugins.Keyboard.disableScroll(true);</p><pre><code>}if (window.StatusBar) {    // org.apache.cordova.statusbar required    StatusBar.styleDefault();}//注册事件函数var onReceiveMaple = function(event) {</code></pre><p> alert(event.msg);<br> };<br> document.addEventListener(“hndev.receiveMessage”, onReceiveMaple, false);</p><p> });</p><h2 id="二、在iOS插件中执行js命令，其它平台类似"><a href="#二、在iOS插件中执行js命令，其它平台类似" class="headerlink" title="二、在iOS插件中执行js命令，其它平台类似"></a>二、在iOS插件中执行js命令，其它平台类似</h2><p>CDVPlugin.commandDelegate evalJs:[NSString stringWithFormat:@”cordova.fireDocumentEvent(‘hndev.%@’,%@)”, eventName, jsString]];</p><p>参数eventName为receiveMessage 参数jsString为传入回调函数的对象，必须为json。如 {“msg”:”Hello Maple!”}</p><h2 id="三、详细可以参考极光推送的实现"><a href="#三、详细可以参考极光推送的实现" class="headerlink" title="三、详细可以参考极光推送的实现"></a>三、详细可以参考极光推送的实现</h2><p><a href="https://github.com/jpush/jpush-phonegap-plugin" target="_blank" rel="noopener">https://github.com/jpush/jpush-phonegap-plugin</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 混合开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> cordova </tag>
+            
+            <tag> ionic </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Mac OS下互联网共享无法连接问题</title>
+      <link href="/2017/02/20/Mac%20OS%E4%B8%8B%E4%BA%92%E8%81%94%E7%BD%91%E5%85%B1%E4%BA%AB%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E9%97%AE%E9%A2%98/"/>
+      <url>/2017/02/20/Mac%20OS%E4%B8%8B%E4%BA%92%E8%81%94%E7%BD%91%E5%85%B1%E4%BA%AB%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E9%97%AE%E9%A2%98/</url>
+      
+        <content type="html"><![CDATA[<p>这个问题折腾我好久了，今天终于解决了，如果你也遇到请试试下列方法： 1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，要求修改很简单的字母，如Maple； 2、如果你已经开启共享网络，请先关闭； 3、进入“系统偏好设置”-》“安全性与隐私”，选择“防火墙”，关闭防火墙。 4、删除以下文件：</p><pre><code>/Library/Preferences/SystemConfiguration/com.apple.nat.plist/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist/Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> 操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mac os </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Cordova插件自定义iOS版</title>
+      <link href="/2017/02/19/Cordova%E6%8F%92%E4%BB%B6%E8%87%AA%E5%AE%9A%E4%B9%89iOS%E7%89%88/"/>
+      <url>/2017/02/19/Cordova%E6%8F%92%E4%BB%B6%E8%87%AA%E5%AE%9A%E4%B9%89iOS%E7%89%88/</url>
+      
+        <content type="html"><![CDATA[<p>Cordova版本：6.0.0</p><h2 id="一、参考官网搭建基本环境"><a href="#一、参考官网搭建基本环境" class="headerlink" title="一、参考官网搭建基本环境"></a>一、参考官网搭建基本环境</h2><p><a href="http://cordova.apache.org/#getstarted" target="_blank" rel="noopener">http://cordova.apache.org/#getstarted</a> 1、npm install -g cordova 2、cordova create helloPlugin 3、cordova platform add ios 4、cordova run ios 按照上述操作已经搭建好了一个测试环境，我们做好后的插件就是在helloPlugin项目中做测试。</p><h2 id="二、继续参考官方文档搭建插件管理环境"><a href="#二、继续参考官方文档搭建插件管理环境" class="headerlink" title="二、继续参考官方文档搭建插件管理环境"></a>二、继续参考官方文档搭建插件管理环境</h2><p><a href="http://cordova.apache.org/docs/zh-cn/6.x/plugin_ref/plugman.html" target="_blank" rel="noopener">http://cordova.apache.org/docs/zh-cn/6.x/plugin_ref/plugman.html</a> 1、npm install -g plugman 2、 plugman create –name dialog –plugin_id cordova-plugin-dialog –plugin_version 0.1 –variable author=Maple 上述命令执行完，我们已经创建了一个插件目录。</p><h2 id="三、编写iOS版插件，其它平台类似"><a href="#三、编写iOS版插件，其它平台类似" class="headerlink" title="三、编写iOS版插件，其它平台类似"></a>三、编写iOS版插件，其它平台类似</h2><p><a href="http://cordova.apache.org/docs/zh-cn/6.x/guide/platforms/ios/plugin.html" target="_blank" rel="noopener">http://cordova.apache.org/docs/zh-cn/6.x/guide/platforms/ios/plugin.html</a> 1、参考官方文档创建一个iOS插件类： HndevDialog.h:</p><p>#import &lt;UIKit/UIKit.h&gt;</p><p>#import &lt;Cordova/CDVPlugin.h&gt;</p><p>@interface HndevDialog : CDVPlugin</p><p>- (void)showMessageBox:(CDVInvokedUrlCommand*)command;</p><p>@end</p><p>HndevDialog.m:</p><p>#import “HndevDialog.h”</p><p>@implementation HndevDialog</p><p>- (void)showMessageBox:(CDVInvokedUrlCommand<em>)command<br>{<br>    CDVPluginResult</em> pluginResult = nil;<br>    if (command.arguments.count == 2) {<br>        NSString<em> title = [command.arguments objectAtIndex:0];<br>        NSString</em> message = [command.arguments objectAtIndex:1];<br>        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@”Cancel” otherButtonTitles:nil, nil];<br>        [alertView show];<br>        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];<br>    }<br>    else<br>    {<br>        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@”Arg was invalid.”];<br>    }<br>    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];<br>}</p><p>@end</p><p>把上述两个文件放到插件工程dialog/src/ios/目录下。编写上述类时可以使用xcode开发工具进行编写，编译没问题再直接拷过来。 2、修改dialog/plugin.xml文件</p><p>&lt;?xml version=’1.0’ encoding=’utf-8’?&gt;</p><plugin id="cordova-plugin-dialog" version="0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"><br> <name>dialog</name><br> <author>Maple</author><br> <js-module name="dialog" src="www/dialog.js"><br>     <clobbers target="cordova.plugins.dialog"><br> </clobbers></js-module><br> <platform name="ios"><br>     <config-file target="config.xml" parent="/*"><br>         <feature name="HndevDialog"><br>             <param name="ios-package" value="HndevDialog"><br>         </feature><br>     </config-file><br><br>     <header-file src="src/ios/HndevDialog.h"><br>     <source-file src="src/ios/HndevDialog.m"><br> </source-file></header-file></platform><br></plugin><p>3、修改dialog/www/dialog.js文件</p><p>var exec = require(‘cordova/exec’);</p><p>exports.show = function(title, msg, success, error) {<br>    exec(success, error, “HndevDialog”, “showMessageBox”, [title, msg]);<br>};</p><p>到此插件的代码基本完成。</p><h2 id="四、安装插件并验证可用性"><a href="#四、安装插件并验证可用性" class="headerlink" title="四、安装插件并验证可用性"></a>四、安装插件并验证可用性</h2><p>回到第一章我们创建的helloPlugin项目目录 1、 cordova plugin add /Users/maple/Documents/ionic/dialog 上面的路径就是你的插件绝对路径。 2、在helloPlugin/www/js/index.js增加测试代码:</p><p>var app = {<br> // Application Constructor<br> initialize: function() {<br> this.bindEvents();<br> },<br> // Bind Event Listeners<br> //<br> // Bind any events that are required on startup. Common events are:<br> // ‘load’, ‘deviceready’, ‘offline’, and ‘online’.<br> bindEvents: function() {<br> document.addEventListener(‘deviceready’, this.onDeviceReady, false);<br> },<br> // deviceready Event Handler<br> //<br> // The scope of ‘this’ is the event. In order to call the ‘receivedEvent’<br> // function, we must explicitly call ‘app.receivedEvent(…);’<br> onDeviceReady: function() {<br>     app.receivedEvent(‘deviceready’);<br> var dialog = cordova.require(‘cordova-plugin-dialog.dialog’);<br> dialog.show(‘Dialog Title’, ‘Hello Maple!’,function() {</p><p> }, function(message) {<br> alert(message);<br> });</p><p> },<br> // Update DOM on a Received Event<br> receivedEvent: function(id) {<br> var parentElement = document.getElementById(id);<br> var listeningElement = parentElement.querySelector(‘.listening’);<br> var receivedElement = parentElement.querySelector(‘.received’);</p><p> listeningElement.setAttribute(‘style’, ‘display:none;’);<br> receivedElement.setAttribute(‘style’, ‘display:block;’);</p><p> console.log(‘Received Event: ‘ + id);<br> }<br>};</p><p>app.initialize();</p><p>3、cordova run ios 执行效果如图： <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2017/02/result.jpeg" alt="result"> 大功告成，附上插件源码：<a href="https://github.com/angelmeng86/cordova-plugin-dialog" target="_blank" rel="noopener">https://github.com/angelmeng86/cordova-plugin-dialog</a> 谢谢支持！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 混合开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> cordova </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>ionic 安装问题汇总</title>
+      <link href="/2017/02/14/ionic%20%E5%AE%89%E8%A3%85%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/"/>
+      <url>/2017/02/14/ionic%20%E5%AE%89%E8%A3%85%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/</url>
+      
+        <content type="html"><![CDATA[<p>一、ionic info出现如下警告 <strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong>**</strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong> Dependency warning - for the CLI to run correctly, it is highly recommended to install/upgrade the following: Please install your Cordova CLI to version  &gt;=4.2.0 `npm install -g cordova` <strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong><strong>**</strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong> 解决办法： sudo npm install -g <a href="mailto:cordova@6.0.0" target="_blank" rel="noopener">cordova@6.0.0</a>   二、ios-deploy无法安装 解决办法： sudo npm install -g ios-deploy –unsafe-perm=true   三、ionic run ios –device真机调试失败 解决办法： 进入到项目目录platform/ios中，打开xcode项目，然后配置所使用的开发者账号和签名</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 混合开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ionic </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS开发小记</title>
+      <link href="/2016/12/12/iOS%E5%BC%80%E5%8F%91%E5%B0%8F%E8%AE%B0/"/>
+      <url>/2016/12/12/iOS%E5%BC%80%E5%8F%91%E5%B0%8F%E8%AE%B0/</url>
+      
+        <content type="html"><![CDATA[<p>20150808 在使用nib加载view时，千万注意锚定功能合理选择，不然将会导致不可预知的高度缩放问题，因为iOS7以上版本，页面在加载时一般会进行一次缩放，这样它同时会对里面的控件也进行相应的缩放操作，谨记！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS UIScroll的一个BUG</title>
+      <link href="/2016/12/12/iOS%20UIScroll%E7%9A%84%E4%B8%80%E4%B8%AABUG/"/>
+      <url>/2016/12/12/iOS%20UIScroll%E7%9A%84%E4%B8%80%E4%B8%AABUG/</url>
+      
+        <content type="html"><![CDATA[<p>之前发现了个UIScroll的BUG，让我郁闷半天，就是当继承该类时，如果使用init方法初始化，其将依次调用initWithFrame和init。真的很让人费解。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Android驱动设备节点自动创建</title>
+      <link href="/2016/10/19/Android%E9%A9%B1%E5%8A%A8%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9%E8%87%AA%E5%8A%A8%E5%88%9B%E5%BB%BA/"/>
+      <url>/2016/10/19/Android%E9%A9%B1%E5%8A%A8%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9%E8%87%AA%E5%8A%A8%E5%88%9B%E5%BB%BA/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-背景"><a href="#0x00-背景" class="headerlink" title="0x00 背景"></a>0x00 背景</h2><p>最近帮同事解决一个问题，就是在Ubuntu（主机）下编译的USB驱动程序，在设备热插拔的时候会自动创建设备节点，但是该驱动程序移植到Android系统下，则需要手动创建节点，该节点还需要手工配置DAC和MAC安全策略，对于实际使用中非常麻烦；</p><h2 id="0x01-问题分析及解决"><a href="#0x01-问题分析及解决" class="headerlink" title="0x01 问题分析及解决"></a>0x01 问题分析及解决</h2><p>参见文章《<a href="http://blog.chinaunix.net/uid-24545924-id-3128349.html" target="_blank" rel="noopener">Android Uevent 分析，从kernel到framework</a> 》 我们知道Android上层的uevent事件使用了自个的一套实现，接下来我们开发分析代码，源码文件：system/core/init/devices.c</p><p>static void handle_generic_device_event(struct uevent <em>uevent)<br>{<br>    char </em>base;<br>    const char *name;<br>    char devpath[DEVPATH_LEN] = {0};<br>    char **links = NULL;</p><pre><code>INFO(&quot;lwz usb: generic\_device\_event start\\n&quot;);name = parse\_device\_name(uevent, 64);if (!name)    return;</code></pre><p>//打印收到的热插拔事件信息<br>INFO(“maple usb1: device_name:%s, major:%d, minor:%d, action:%s name:%s\n”,  uevent-&gt;device_name, uevent-&gt;major, uevent-&gt;minor, uevent-&gt;action, name);<br>    struct ueventd_subsystem *subsystem =<br>            ueventd_subsystem_find_by_name(uevent-&gt;subsystem);</p><pre><code>if (subsystem) {    const char *devname;    switch (subsystem-&gt;devname_src) {    case DEVNAME\_UEVENT\_DEVNAME:        devname = uevent-&gt;device_name;        break;    case DEVNAME\_UEVENT\_DEVPATH:        devname = name;        break;    default:        ERROR(&quot;%s subsystem&apos;s devpath option is not set; ignoring event\\n&quot;,                uevent-&gt;subsystem);        return;    }    if (!assemble_devpath(devpath, subsystem-&gt;dirname, devname))        return;    mkdir\_recursive\_for_devpath(devpath);} else if (!strncmp(uevent-&gt;subsystem, &quot;usb&quot;, 3)) {     if (!strcmp(uevent-&gt;subsystem, &quot;usb&quot;)) {        if (uevent-&gt;device_name) {            if (!assemble\_devpath(devpath, &quot;/dev&quot;, uevent-&gt;device\_name))                return;            mkdir\_recursive\_for_devpath(devpath);         }         else {             /\* This imitates the file system that would be created              \* if we were using devfs instead.              \* Minors are broken up into groups of 128, starting at &quot;001&quot;              */             int bus_id = uevent-&gt;minor / 128 + 1;             int device_id = uevent-&gt;minor % 128 + 1;             /\* build directories */             make_dir(&quot;/dev/bus&quot;, 0755);             make_dir(&quot;/dev/bus/usb&quot;, 0755);             snprintf(devpath, sizeof(devpath), &quot;/dev/bus/usb/%03d&quot;, bus_id);             make_dir(devpath, 0755);             snprintf(devpath, sizeof(devpath), &quot;/dev/bus/usb/%03d/%03d&quot;, bus\_id, device\_id);         }     } else {         /\* ignore other USB events */         //忽略一些不符合上述条件的USB事件，并返回    INFO(&quot;maple usb: ignore other USB events\\n&quot;);         //我这里是通过判断创建的节点名称是否是我们想要的，如果是则继续往下执行进行节点的创建和移除操作     if(!strncmp(uevent-&gt;device_name, &quot;myusb&quot;, 5)) {    base = &quot;/dev/&quot;;         }         else         return;     } } else if (!strncmp(uevent-&gt;subsystem, &quot;graphics&quot;, 8)) {     base = &quot;/dev/graphics/&quot;;     make_dir(base, 0755); } else if (!strncmp(uevent-&gt;subsystem, &quot;drm&quot;, 3)) {     base = &quot;/dev/dri/&quot;;     make_dir(base, 0755); } else if (!strncmp(uevent-&gt;subsystem, &quot;oncrpc&quot;, 6)) {     base = &quot;/dev/oncrpc/&quot;;     make_dir(base, 0755); } else if (!strncmp(uevent-&gt;subsystem, &quot;adsp&quot;, 4)) {     base = &quot;/dev/adsp/&quot;;     make_dir(base, 0755); } else if (!strncmp(uevent-&gt;subsystem, &quot;msm_camera&quot;, 10)) {     base = &quot;/dev/msm_camera/&quot;;     make_dir(base, 0755); } else if(!strncmp(uevent-&gt;subsystem, &quot;input&quot;, 5)) {     base = &quot;/dev/input/&quot;;     make_dir(base, 0755); } else if(!strncmp(uevent-&gt;subsystem, &quot;mtd&quot;, 3)) {     base = &quot;/dev/mtd/&quot;;     make_dir(base, 0755); } else if(!strncmp(uevent-&gt;subsystem, &quot;sound&quot;, 5)) {     base = &quot;/dev/snd/&quot;;     make_dir(base, 0755); } else if(!strncmp(uevent-&gt;subsystem, &quot;misc&quot;, 4) &amp;&amp;             !strncmp(name, &quot;log_&quot;, 4)) {     kernel_logger();     base = &quot;/dev/log/&quot;;     make_dir(base, 0755);     name += 4; } else if (!strncmp(uevent-&gt;subsystem, &quot;dvb&quot;, 3)) {     /\* This imitates the file system that would be created      \* if we were using devfs instead to preserve backward compatibility      \* for users of dvb devices      */     int adapter_id;     char dev_name\[20\] = {0};     sscanf(name, &quot;dvb%d.%s&quot;, &amp;adapter\_id, dev\_name);     /\* build dvb directory */     base = &quot;/dev/dvb&quot;;     mkdir(base, 0755);     /\* build adapter directory */     snprintf(devpath, sizeof(devpath), &quot;/dev/dvb/adapter%d&quot;, adapter_id);     mkdir(devpath, 0755);     /\* build actual device directory */     snprintf(devpath, sizeof(devpath), &quot;/dev/dvb/adapter%d/%s&quot;,              adapter\_id, dev\_name); } else     base = &quot;/dev/&quot;; links = get\_character\_device_symlinks(uevent); if (!links)     links = get\_v4l\_device_symlinks(uevent); if (!devpath\[0\])     snprintf(devpath, sizeof(devpath), &quot;%s%s&quot;, base, name);//开始进行热插拔处理，包括设备节点的创建和移除，可参考相关代码继续分析INFO(&quot;maple usb: devpath %s, major:%d, minor:%d, action:%s\\n&quot;, devpath, uevent-&gt;major, uevent-&gt;minor, uevent-&gt;action); handle_device(uevent-&gt;action, devpath, uevent-&gt;path, 0,         uevent-&gt;major, uevent-&gt;minor, links);</code></pre><p>}</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Linux kernel directio（内核态实现direct IO）</title>
+      <link href="/2016/10/19/Linux%20kernel%20directio%EF%BC%88%E5%86%85%E6%A0%B8%E6%80%81%E5%AE%9E%E7%8E%B0direct%20IO%EF%BC%89/"/>
+      <url>/2016/10/19/Linux%20kernel%20directio%EF%BC%88%E5%86%85%E6%A0%B8%E6%80%81%E5%AE%9E%E7%8E%B0direct%20IO%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-需求"><a href="#0x00-需求" class="headerlink" title="0x00 需求"></a>0x00 需求</h2><p>近段时间在研究Strongswans，需要加入硬件算法，由于Strongswans中的IPSec通道加密依赖于内核的XFRM框架，所以需要在内核层实现加密硬件的驱动，涉及到了对设备文件的O_DIRECT操作，在测试中遇到一些问题并通过以下文章受到启发，对其进行了代码改进。 参考文章：《<a href="http://blog.csdn.net/u010059563/article/details/41655835" target="_blank" rel="noopener">内核态下实现direct IO</a>》</p><h2 id="0x01-优化"><a href="#0x01-优化" class="headerlink" title="0x01 优化"></a>0x01 优化</h2><p>文章所使用的do_mmap_pgoff方法是内核内部方法，所以需要对内核进行修改并重新编译后才能运用于内核模块的使用。通过该方法顺藤摸瓜，我找到了一个内核导出方法，经测试能够正常使用，方法如下：</p><p>extern int vm_munmap(unsigned long, size_t);<br>extern unsigned long vm_mmap(struct file *, unsigned long,<br>        unsigned long, unsigned long,<br>        unsigned long, unsigned long);</p><p>vm_mmap内部其实就是调用了do_mmap_pgoff方法，原理一样，只是不需要重新编译内核，参考上述文章代码修改如下（蓝色字体）：</p><p>#include &lt;linux/init.h&gt;</p><p>#include &lt;linux/kernel.h&gt;</p><p>#include &lt;linux/module.h&gt;</p><p>#include &lt;linux/mm.h&gt;</p><p>#include &lt;linux/fs.h&gt;</p><p>#include &lt;linux/time.h&gt;</p><p>#include &lt;asm/uaccess.h&gt;</p><p>#include &lt;asm/mman.h&gt;</p><p>#define LEN 1024*64</p><p>#define COUNT 1024*1024/32</p><p>#define DIR_OUT “/home/wpp/Desktop/wpp.txt”</p><p>unsigned long run_time(struct timeval end, struct timeval start)<br>{<br>    unsigned long sec, usec;</p><pre><code>if(end.tv\_usec &gt;= start.tv\_usec){    sec = end.tv\_sec - start.tv\_sec;    usec = end.tv\_usec - start.tv\_usec;}else{    sec = end.tv\_sec - start.tv\_sec - 1;    usec = end.tv\_usec + 1000000 - start.tv\_usec;}printk(&quot;the run time is %lus%luus\\n&quot;, sec, usec);return sec*1000000 + usec;</code></pre><p>}</p><p>static int __init temp_init_module(void)<br>{<br>    struct file <em>fp;<br>    char </em>buf;<br>    unsigned long i, populate, rate, time;<br>    struct timeval start, end;<br>    mm_segment_t old_fs;<br>    loff_t pos;<br>    unsigned long memp;</p><pre><code>fp = filp\_open(DIR\_OUT, O\_RDWR | O\_CREAT | O_DIRECT, 0);if(IS_ERR(fp)){    printk(&quot;open error\\n&quot;);    return -1;}buf = NULL;memp = vm\_mmap(NULL, 0, LEN, PROT\_READ | PROT\_WRITE, MAP\_PRIVATE, 0);//add by maplebuf = (char *)memp;//add by maple//buf = (char *)do\_mmap\_pgoff(NULL, 0, LEN, PROT\_READ | PROT\_WRITE, MAP_SHARED, 0, &amp;populate);if(NULL == buf){    printk(&quot;do\_mmap\_pgoff error\\n&quot;);    return -1;}memset(buf, &apos;w&apos;, LEN-1);buf\[LEN-1\] = &apos;\\n&apos;;old\_fs = get\_fs();set\_fs(KERNEL\_DS);pos = 0;do_gettimeofday(&amp;start);for(i=0; i&lt;COUNT; i++)    vfs_write(fp, (char *)buf, LEN, &amp;pos);do_gettimeofday(&amp;end);time = run_time(end, start);rate = (2\*1024\*1000000) / time;printk(&quot;the rate of write no cache is %luM/s\\n&quot;, rate);set\_fs(old\_fs);filp_close(fp, NULL);vm_munmap(memp, LEN);//add by maplereturn 0;</code></pre><p>}</p><p>static void __exit temp_exit_module(void)<br>{<br>    printk(“Goodbye\n”);<br>}</p><p>module_init(temp_init_module);<br>module_exit(temp_exit_module);<br>MODULE_LICENSE(“GPL”);</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 服务端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> kernel </tag>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>linux kernel内核源码gitignore</title>
+      <link href="/2016/09/30/linux%20kernel%E5%86%85%E6%A0%B8%E6%BA%90%E7%A0%81gitignore/"/>
+      <url>/2016/09/30/linux%20kernel%E5%86%85%E6%A0%B8%E6%BA%90%E7%A0%81gitignore/</url>
+      
+        <content type="html"><![CDATA[<p>#<br># NOTE! Don’t add files that are generated in specific<br># subdirectories here. Add them in the “.gitignore” file<br># in that subdirectory instead.<br>#<br># NOTE! Please use ‘git ls-files -i –exclude-standard’<br># command after changing this file, to see if there are<br># any tracked files which get ignored after the change.<br>#<br># Normal rules<br>#<br>.<em></em>.o<br><em>.o.</em><br><em>.a</em>.s<br><em>.ko</em>.so<br><em>.so.dbg</em>.mod.c<br><em>.i</em>.lst<br><em>.symtypes</em>.order<br><em>.elf</em>.bin<br><em>.gz</em>.bz2<br><em>.lzma</em>.xz<br><em>.lz4</em>.lzo<br><em>.patch</em>.gcno<br>modules.builtin<br>Module.symvers</p><p>#<br># Top-level generic files<br>#<br>/tags<br>/TAGS<br>/linux<br>/vmlinux<br>/vmlinuz<br>/System.map<br>/Module.markers</p><p>#<br># Debian directory (make deb-pkg)<br>#<br>/debian/</p><p>#<br># git files that we don’t want to ignore even it they are dot-files<br>#<br>!.gitignore<br>!.mailmap</p><p>#<br># Generated include files<br>#<br>include/config<br>include/generated<br>arch/*/include/generated</p><p># stgit generated dirs<br>patches-*</p><p># quilt’s files<br>patches<br>series</p><p># cscope files<br>cscope.<em><br>ncscope.</em></p><p># gnu global files<br>GPATH<br>GRTAGS<br>GSYMS<br>GTAGS</p><p><em>.orig</em>~<br>\#*#</p><p>#<br># Leavings from module signing<br>#<br>extra_certificates<br>signing_key.priv<br>signing_key.x509<br>x509.genkey</p><p># Kconfig presets<br>all.config</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>如何在Mac OS X中开启或关闭显示隐藏文件命令</title>
+      <link href="/2016/09/24/%E5%A6%82%E4%BD%95%E5%9C%A8Mac%20OS%20X%E4%B8%AD%E5%BC%80%E5%90%AF%E6%88%96%E5%85%B3%E9%97%AD%E6%98%BE%E7%A4%BA%E9%9A%90%E8%97%8F%E6%96%87%E4%BB%B6%E5%91%BD%E4%BB%A4/"/>
+      <url>/2016/09/24/%E5%A6%82%E4%BD%95%E5%9C%A8Mac%20OS%20X%E4%B8%AD%E5%BC%80%E5%90%AF%E6%88%96%E5%85%B3%E9%97%AD%E6%98%BE%E7%A4%BA%E9%9A%90%E8%97%8F%E6%96%87%E4%BB%B6%E5%91%BD%E4%BB%A4/</url>
+      
+        <content type="html"><![CDATA[<p>显示：defaults write com.apple.finder AppleShowAllFiles -bool true 隐藏：defaults write com.apple.finder AppleShowAllFiles -bool false</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mac os </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>使用 gperf 实现高效的 C/C++ 命令行处理</title>
+      <link href="/2016/09/24/%E4%BD%BF%E7%94%A8gperf%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%95%88%E7%9A%84C%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A4%84%E7%90%86/"/>
+      <url>/2016/09/24/%E4%BD%BF%E7%94%A8gperf%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%95%88%E7%9A%84C%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A4%84%E7%90%86/</url>
+      
+        <content type="html"><![CDATA[<h2 id="常见-gperf-选项"><a href="#常见-gperf-选项" class="headerlink" title="常见 gperf 选项"></a>常见 gperf 选项</h2><p>Gperf 是可以接受不同选项的高度可定制工具。gperf 在线手册（参阅 <a href="http://www.ibm.com/developerworks/cn/linux/l-gperf.html#resources" target="_blank" rel="noopener">参考资料小节</a> 中的链接）说明了 gperf 中所有可用的选项，包括：</p><ul><li><strong><code>-L _language-name_</code>：</strong>指示 gperf 使用指定的语言生成输出。目前支持以下几个选项：<ul><li><strong><code>KR-C</code>：</strong>这种老式的 K&amp;R C 可以得到新旧 C 编译器的支持，但是新的符合 ANSI C 标准的编译器可能会生成警告，或者，某些情况下甚至会生成标志错误。</li><li><strong>C：</strong>该选项将生成 C 代码，但是如果不对已有源代码进行调整，则可能无法使用某些旧的 C 编译器进行编译。</li><li><strong><code>ANSI-C</code>：</strong>该选项生成符合 ANSI C 标准的代码，只能使用符合 ANSI C 标准的编译器或 C++ 编译器进行编译。</li><li><strong>C++：</strong>该选项生成 C++ 代码。</li></ul></li><li><strong><code>-N</code>：</strong>该选项允许用户修改查找函数的名称。默认名为 <code>in_word_set()</code>。</li><li><strong><code>-H</code>：</strong>该选项允许用户修改散列例程的名称。默认名为 <code>hash()</code>。</li><li><strong><code>-Z</code>：</strong>该选项在提供了 <code>-L</code> C++ 选项时使用。它允许用户指定所生成的 C++ 类的名称，该类包含 <code>in_word_set()</code> 和 <code>hash()</code> 函数。默认名为<code>Perfect_Hash</code>。</li><li><strong><code>-G</code>：</strong>该选项将生成查找表并将其作为静态全局变量，而不是在查找函数内生成以隐藏该表（默认行为）。</li><li><strong><code>-C</code>：</strong>前面讨论了 Gperf 将生成查找表。<code>-C</code> 选项将创建使用 <code>const</code> 关键字声明的查找表。所有生成的查找表中的内容都是常量 — 即只读形式。很多编译器通过将表放入只读内存中可以生成更高效的代码。</li><li><strong><code>-D</code>：</strong>该选项将处理散列为重复值的关键字。</li><li><strong><code>-t</code>：</strong>该选项允许包含关键字结构。</li><li><strong><code>-K</code>：</strong>该选项允许用户选择关键字结构中的关键字组件的名称。</li><li><strong><code>-p</code>：</strong>该选项可以与较早版本的 gperf 兼容。在早期版本中，它将生成的函数 <code>in_word_set()</code> 返回的默认布尔值（即 0 或 1 ）修改为<code>pointer to wordlist array</code> 类型。这个选项非常有用，尤其是在使用 <code>-t</code>（允许使用用户定义的 <code>structs</code>）选项时。在最新版的 gperf 中并不要求使用该选项并且可以将其删除。</li></ul><p>转自原文：<a href="http://www.ibm.com/developerworks/cn/linux/l-gperf.html" target="_blank" rel="noopener">http://www.ibm.com/developerworks/cn/linux/l-gperf.html</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> gperf </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>automake工具</title>
+      <link href="/2016/09/23/automake%E5%B7%A5%E5%85%B7/"/>
+      <url>/2016/09/23/automake%E5%B7%A5%E5%85%B7/</url>
+      
+        <content type="html"><![CDATA[<p>转自<a href="http://blog.csdn.net/fd315063004/article/details/7785504" target="_blank" rel="noopener">http://blog.csdn.net/fd315063004/article/details/7785504</a> <img src="http://pic002.cnblogs.com/images/2012/89146/2012020923064228.jpg" alt=""></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> automake </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>JNI基础数据签名类型字段对应关系</title>
+      <link href="/2016/09/20/JNI%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%AD%BE%E5%90%8D%E7%B1%BB%E5%9E%8B%E5%AD%97%E6%AE%B5%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB/"/>
+      <url>/2016/09/20/JNI%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%AD%BE%E5%90%8D%E7%B1%BB%E5%9E%8B%E5%AD%97%E6%AE%B5%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Type-Signatures"><a href="#Type-Signatures" class="headerlink" title="Type Signatures"></a>Type Signatures</h2><p>Type Signature</p><p>Java Type</p><p>Z</p><p>boolean</p><p>B</p><p>byte</p><p>C</p><p>char</p><p>S</p><p>short</p><p>I</p><p>int</p><p>J</p><p>long</p><p>F</p><p>float</p><p>D</p><p>double</p><p>L fully-qualified-class ;</p><p>fully-qualified-class</p><p>[ type</p><p>type[]</p><p>( arg-types ) ret-type</p><p>method type</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 基础开发知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> jni </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Xposed之拦截经验分享</title>
+      <link href="/2016/09/12/Xposed%E4%B9%8B%E6%8B%A6%E6%88%AA%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/"/>
+      <url>/2016/09/12/Xposed%E4%B9%8B%E6%8B%A6%E6%88%AA%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-简述"><a href="#0x00-简述" class="headerlink" title="0x00 简述"></a>0x00 简述</h2><p>Xposed可以拦截Davik和Art虚拟机中的Java级方法，包括定义的jni接口，所以它能做的事情很多，只有想不到，没有做不到。</p><h2 id="0x01-某信拦截"><a href="#0x01-某信拦截" class="headerlink" title="0x01 某信拦截"></a>0x01 某信拦截</h2><p>某信是国内目前最流行的通信软件，相信大家都有很多这样那样的新想法，比如某商、某营销等等；下面针对某信里面的一些拦截思路进行整理，与大家分享一下。</p><h2 id="0x02-反编译工具"><a href="#0x02-反编译工具" class="headerlink" title="0x02 反编译工具"></a>0x02 反编译工具</h2><p>首先，我们要拦截某信，肯定是需要对某信的业务代码进行分析，所以需要对某信应用进行反编译（如果应用加壳的话，会增加一定难度，这里仅讨论未加壳的情况）。 用到的工具有：</p><h3 id="1、dex2jar-jd-gui"><a href="#1、dex2jar-jd-gui" class="headerlink" title="1、dex2jar+jd-gui"></a>1、dex2jar+jd-gui</h3><p>很好用的一个工具，但是反编译出来的java代码会有一些错误。</p><h3 id="2、Smali2Java"><a href="#2、Smali2Java" class="headerlink" title="2、Smali2Java"></a>2、Smali2Java</h3><p>和上面的工具差不多，只有windows平台版本。</p><h3 id="3、apktool"><a href="#3、apktool" class="headerlink" title="3、apktool"></a>3、apktool</h3><p>该工具用于对APK进行解包，如AndroidMinifest.xml文件等，它还可以把dex反编译为smali代码，当上述反编译工具得到的代码不全的时候可以结合smali代码进行分析。</p><h2 id="0x03-功能拦截思路"><a href="#0x03-功能拦截思路" class="headerlink" title="0x03 功能拦截思路"></a>0x03 功能拦截思路</h2><p>大多数的APK应用都没有加壳保护，但是都进行了混淆，这样使得反编译出来的代码都是一些无意义的abcd…，这样增大了我们逆向分析的难度。所以我们需要一些方法去查找我们想要的功能，并进行拦截。 针对某信的文本、语音、图片的拦截思路都是大同小异，就是根据<strong>系统提供的方法</strong>去往上追溯分析（<strong>Framework层提供的API不会被混淆，应用和系统资源交互一定会使用到这些API</strong>），然后找到一个合适的拦截点进行拦截，然后对输入的数据进行自定义需求处理。 比如说文本的替换功能分析，我们可以通过对TextView的getText和setText方法进行拦截，因为应用要获取用户输入的消息必须从编辑框（系统控件）中获取信息，然后最终进行业务处理后进行发送，我们就可以在这一些地方进行拦截进行测试； 这样拦截后我们又遇到一个问题，因为应用很多地方都用到上述两个方法，我们怎么定位到想到的地方，这里我们可以通过打印栈信息往上分析： <strong>Log.d(tag, Log.getStackTraceString(new Throwable()));</strong> 在拦截点通过上述方式可以把调用的栈信息打印出来，结合反编译出来的代码进行分析，找到我们想要的拦截点。 与此类推，语音和图片的拦截点查找也是如此，通过对系统录音的几个方法进行拦截找到拦截测试点，再通过栈信息查找到最优的拦截点进行拦截处理。语音和图片都是文件，所以它们也可以通过<strong>文件IO的API（FileInputStream和FileOutputStream）</strong>去进行拦截然后分析栈信息。</p><h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>上述大概讲述了一下某信应用的一些拦截思路，这一块的理解需要更多的实践去消化，另外如果有更好的方法可以在下方给我们留言，大家一同探讨。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+            <tag> xposed </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Android应用强制停止工具</title>
+      <link href="/2016/09/07/Android%E5%BA%94%E7%94%A8%E5%BC%BA%E5%88%B6%E5%81%9C%E6%AD%A2%E5%B7%A5%E5%85%B7/"/>
+      <url>/2016/09/07/Android%E5%BA%94%E7%94%A8%E5%BC%BA%E5%88%B6%E5%81%9C%E6%AD%A2%E5%B7%A5%E5%85%B7/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-背景需求"><a href="#0x00-背景需求" class="headerlink" title="0x00 背景需求"></a>0x00 背景需求</h2><p>自己使用的Android定制手机，用了一段时间后总是发现系统响应慢或者死机，所以根据Android系统设置中强制停止应用的原理，写了一个简单小工具，给自己用，也和大家分享一下。</p><h2 id="0x01-技术实现"><a href="#0x01-技术实现" class="headerlink" title="0x01 技术实现"></a>0x01 技术实现</h2><p>Android系统中Setting设置有个功能，应用程序强制停止，该功能只能执行单个应用的停止，而且由于界面跳转和操作繁琐，对如今我们所使用的手机存在几十个应用的情况，更是像一个鸡肋； 借着这个思路我写一个小程序实现批量的应用程序停止操作，借鉴framework源码，查到该功能使用了ActivityManager.forceStopPackage方法；</p><h2 id="0x02-关键代码"><a href="#0x02-关键代码" class="headerlink" title="0x02 关键代码"></a>0x02 关键代码</h2><p>//通过传入应用程序包名强制停止该应用，并且不允许该应用自动启动，直到用户手动启动它<br>private void killProcesses(String packname) {<br>ActivityManager am = (ActivityManager)this.getSystemService(<br>Context.ACTIVITY_SERVICE);<br>am.forceStopPackage(packname);<br>}</p><p>上述方法需要的包名我们可以通过两种方式获取，一种是通过Android的服务接口获取当前所安装的应用，另一种是通过shell命令获取； 下面讲的就是通过shell命令获取的方法：</p><p>//获取第三方安装的应用包名列表，可以使用adb shell终端输入看看结果<br>pm list packages -3</p><p>得到包名后就可以结合上述killProcesses方法进行批量应用的停止清理操作了； 具体工程参考：<a href="https://github.com/angelmeng86/AppForceStop" target="_blank" rel="noopener">https://github.com/angelmeng86/AppForceStop</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>OpenSSL常用命令</title>
+      <link href="/2016/08/31/OpenSSL%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/"/>
+      <url>/2016/08/31/OpenSSL%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
+      
+        <content type="html"><![CDATA[<p>把自己经常使用的openssl命令进行记录，方便查阅</p><h3 id="x509证书格式转换-DER-PEM"><a href="#x509证书格式转换-DER-PEM" class="headerlink" title="x509证书格式转换 DER-PEM"></a>x509证书格式转换 DER-PEM</h3><p>openssl x509 -inform DER -outform PEM -in cert.der -out cert.pem<br>openssl x509 -inform PEM -outform DER -in cert.pem -out cert.der<br>命令帮助：openssl x509 -h</p><h3 id="Pkcs7-p7b-证书链使用"><a href="#Pkcs7-p7b-证书链使用" class="headerlink" title="Pkcs7 p7b 证书链使用"></a>Pkcs7 p7b 证书链使用</h3><p>openssl crl2pkcs7 -nocrl -certfile cert1.pem -certfile cert2.pem -certfile cert3.pem -out certchain.p7b<br>命令帮助：openssl crl2pkcs7 -h</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> openssl </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Linux常用命令</title>
+      <link href="/2016/08/23/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/"/>
+      <url>/2016/08/23/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-安装包安装卸载"><a href="#0x01-安装包安装卸载" class="headerlink" title="0x01 安装包安装卸载"></a>0x01 安装包安装卸载</h2><p>sudo apt-get install google-chrome-unstable<br>sudo apt-get remove –purge google-chrome-unstable<br>sudo apt-get autoremove</p><h2 id="0x02-监控文件更新信息，用于查看日志文件"><a href="#0x02-监控文件更新信息，用于查看日志文件" class="headerlink" title="0x02 监控文件更新信息，用于查看日志文件"></a>0x02 监控文件更新信息，用于查看日志文件</h2><p>tail -f /var/log/messages</p><h2 id="0x03-开启root用户权限"><a href="#0x03-开启root用户权限" class="headerlink" title="0x03 开启root用户权限"></a>0x03 开启root用户权限</h2><p>sudo passwd root</p><h2 id="0x04-ssh开启root远程登录权限"><a href="#0x04-ssh开启root远程登录权限" class="headerlink" title="0x04 ssh开启root远程登录权限"></a>0x04 ssh开启root远程登录权限</h2><p>sudo vi /etc/ssh/sshd_config<br>将PermitRootLogin without-password 修改为PermitRootLogin yes<br>重启ssh服务<br>service ssh restart</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 基础开发知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+            <tag> shell </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Ubuntu下编译Strongswan5.5</title>
+      <link href="/2016/08/22/Ubuntu%E4%B8%8B%E7%BC%96%E8%AF%91Strongswan5.5/"/>
+      <url>/2016/08/22/Ubuntu%E4%B8%8B%E7%BC%96%E8%AF%91Strongswan5.5/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-下载源码"><a href="#0x00-下载源码" class="headerlink" title="0x00 下载源码"></a>0x00 下载源码</h2><p>首先去官网Download</p><p>wget <a href="https://download.strongswan.org/strongswan-5.5.0.tar.bz2" target="_blank" rel="noopener">https://download.strongswan.org/strongswan-5.5.0.tar.bz2</a></p><p>tar -xvf strongswan-5.5.0.tar.bz2</p><h2 id="0x01-系统环境"><a href="#0x01-系统环境" class="headerlink" title="0x01 系统环境"></a>0x01 系统环境</h2><p>Ubuntu 14.04TLS</p><h2 id="0x02-编译依赖"><a href="#0x02-编译依赖" class="headerlink" title="0x02 编译依赖"></a>0x02 编译依赖</h2><p>sudo apt-get install libssl-dev libgmp-dev</p><h2 id="0x03-编译配置"><a href="#0x03-编译配置" class="headerlink" title="0x03 编译配置"></a>0x03 编译配置</h2><p>./configure –prefix=/usr –sysconfdir=/etc –enable-openssl –enable-nat-transport –disable-mysql –disable-ldap –disable-static –enable-shared –enable-md4 –enable-eap-mschapv2 –enable-eap-aka –enable-eap-aka-3gpp2 –enable-eap-gtc –enable-eap-identity –enable-eap-md5 –enable-eap-peap –enable-eap-radius –enable-eap-sim –enable-eap-sim-file –enable-eap-simaka-pseudonym –enable-eap-simaka-reauth –enable-eap-simaka-sql –enable-eap-tls –enable-eap-tnc –enable-eap-ttls</p><h2 id="0x04-编译安装"><a href="#0x04-编译安装" class="headerlink" title="0x04 编译安装"></a>0x04 编译安装</h2><p>make</p><p>sudo make install</p><h2 id="0x05-配置使用"><a href="#0x05-配置使用" class="headerlink" title="0x05 配置使用"></a>0x05 配置使用</h2><p>请参考<a href="https://zh.opensuse.org/SDB:Setup_Ipsec_VPN_with_Strongswan" target="_blank" rel="noopener">https://zh.opensuse.org/SDB:Setup_Ipsec_VPN_with_Strongswan</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 服务端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ipsec </tag>
+            
+            <tag> strongswan </tag>
+            
+            <tag> ubuntu </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iOS中backBarButtonItem去掉文字，保留原生箭头方法</title>
+      <link href="/2016/07/31/iOS%E4%B8%ADbackBarButtonItem%E5%8E%BB%E6%8E%89%E6%96%87%E5%AD%97%EF%BC%8C%E4%BF%9D%E7%95%99%E5%8E%9F%E7%94%9F%E7%AE%AD%E5%A4%B4%E6%96%B9%E6%B3%95/"/>
+      <url>/2016/07/31/iOS%E4%B8%ADbackBarButtonItem%E5%8E%BB%E6%8E%89%E6%96%87%E5%AD%97%EF%BC%8C%E4%BF%9D%E7%95%99%E5%8E%9F%E7%94%9F%E7%AE%AD%E5%A4%B4%E6%96%B9%E6%B3%95/</url>
+      
+        <content type="html"><![CDATA[<p>self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@”” style:UIBarButtonItemStylePlain target:nil action:nil];</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Gitlab源码管理及持续集成</title>
+      <link href="/2016/06/16/Gitlab%E6%BA%90%E7%A0%81%E7%AE%A1%E7%90%86%E5%8F%8A%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/"/>
+      <url>/2016/06/16/Gitlab%E6%BA%90%E7%A0%81%E7%AE%A1%E7%90%86%E5%8F%8A%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/</url>
+      
+        <content type="html"><![CDATA[<h1 id="0x01-Gitlab安装"><a href="#0x01-Gitlab安装" class="headerlink" title="   0x01 Gitlab安装"></a>   <strong>0x01 Gitlab安装</strong></h1><p>Gitlab到目前为止已经发展得很成熟了，可以登录其官方网站进行对于操作系统的安装包下载，基本安装方式都是一键傻瓜安装。 网址：<a href="https://about.gitlab.com/" target="_blank" rel="noopener">https://about.gitlab.com/</a> 我使用的是Ubuntu 64位系统，安装包gitlab-ce_8.7.3-ce.0_amd64.deb，建议安装8.0以上版本，因为该版本可以很好的支持可持续集成功能。</p><pre><code>**0x02 Gitlab源码管理**</code></pre><p>=======================</p><p>1、首先，登录Gitlab，添加自己的SSH Keys，如图 <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2016/06/snapshot1.png" alt="snapshot1"> 2、创建一个test仓库 <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2016/06/snapshot2.png" alt="snapshot2">    3、输入如下命令，提交代码至仓库中。</p><p>$ mkdir test</p><p>$ touch main.c</p><p>$ vim main.c</p><p>#include &lt;stdio.h&gt;</p><p>int main()<br>{<br>printf(“Hello GitLab!\n”);<br>return 0;<br>}</p><p>$ git init</p><p>$ git add -A</p><p>$ git commit -m “git init”</p><p>$ git remote add origin  <a href="mailto:git@192.168.1.5" target="_blank" rel="noopener">git@192.168.1.5</a>:mapple/test.git</p><p>$ ssh-add SSH Key对应的私钥文件</p><p>$ git push -u origin master</p><pre><code>0x03 Gitlab持续集成</code></pre><p>===================</p><p>首先，在你进行持续集成的服务器上安装如下工具</p><p>  curl -L <a href="https://packages.gitlab.com/install/repositories/runner/gitlab-ci-multi-runner/script.deb.sh" target="_blank" rel="noopener">https://packages.gitlab.com/install/repositories/runner/gitlab-ci-multi-runner/script.deb.sh</a> | sudo bash<br>  sudo apt-get install gitlab-ci-multi-runner</p><p>  然后注册<br>sudo gitlab-ci-multi-runner register</p><p>当中会让你填写一些信息. 例如你的 gitlab-ci coordinator 的地址和注册这个 runner 的 token，这两个在你 GitLab 中可以找到。关于 executor 的话, 我这里使用的是 shell, 因为我将 runner 直接运行在物理机的系统上。如下图，在项目的Settings里，有个Runner选项。 <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2016/06/snapshot3.png" alt="snapshot3"> 上图里面的地址为<a href="http://11.12.110.79/ci，token为UsxTMH-QCwxQxsoPLa9y" target="_blank" rel="noopener">http://11.12.110.79/ci，token为UsxTMH-QCwxQxsoPLa9y</a> <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2016/06/snapshot4.png" alt="snapshot4"> 如上，配置完成后可以在界面中看到配置好的Runner。 <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2016/06/snapshot5.png" alt="snapshot5"> 接下来，参考<a href="http://docs.gitlab.com/ce/ci/quick_start/README.html添加.gitlab-ci.yml文件到test仓库根目录下，我的内容如下：" target="_blank" rel="noopener">http://docs.gitlab.com/ce/ci/quick_start/README.html添加.gitlab-ci.yml文件到test仓库根目录下，我的内容如下：</a></p><p>before_script:<br>- java -version</p><p>testbuild:<br>script:<br>- gcc main.c<br>- cp a.out ~/<br>- ./a.out</p><p>上述代码中，before_script为脚本执行前的准备工作，每一行就相当于在shell中执行一个命令，上述内容的意思就是打印java的版本信息，然后gcc编译main.c文件，拷贝编译出来的a.out至当前用户的主目录下，执行当前编译出来的可执行程序，该文件执行一些命令很灵活，可以进行相应的自动构建编译，然后自动单元测试，最后自动部署。</p><p>$ git add .gitlab-ci.yml</p><p>$ git commit -m “add.gitlab-ci.yml”</p><p>$ git push</p><p>该文件推送到仓库后会自动触发上述自动脚本的执行。 <img src="http://www.hndev.cn/wordpress/wp-content/uploads/2016/06/snapshot6.png" alt="snapshot6"> 基本的用法就讲到这，给大家抛砖引玉啦。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 开发工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Ubuntu下Android 5.0源码环境搭建</title>
+      <link href="/2016/06/15/Ubuntu%E4%B8%8BAndroid%205.0%E6%BA%90%E7%A0%81%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+      <url>/2016/06/15/Ubuntu%E4%B8%8BAndroid%205.0%E6%BA%90%E7%A0%81%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+      
+        <content type="html"><![CDATA[<p><strong>1、安装ubuntu</strong></p><p>编译Android 5.1需要ubuntu 14.04 TLS 64位的操作系统，在百度上搜索ubuntu，到ubuntu官网下载Ubuntu 64位桌面（desktop）版本，进行安装。安装完成后，需要更新一下ubuntu源。</p><p> Android5.1系统源码编译的磁盘空间要求较高，ubuntu 的磁盘空间需要分配60G以上，内存需要4G以上，否则容易出现编译错误等问题。</p><p><strong>2、安装openjdk-7（编译Android 5.0以上）</strong></p><p>sudo apt-get install openjdk-7-jdk <strong>3、安装编译依赖的软件</strong></p><p>使用如下命令安装依赖软件：</p><p><code>sudo apt-get install bison build-essential curl flex git gnupg gperf libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop maven openjdk-7-jdk pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev mkisofs</code></p><pre><code>sudo apt-get install g++-multilib gcc-multilib lib32ncurses5-dev lib32readline-gplv2-dev lib32z1-dev</code></pre><p><strong>4、配置Cache</strong></p><p>sudo apt-get install ccache</p><p>source ~/.bashrc</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Android 4.0.3源码环境搭建及编译常见问题</title>
+      <link href="/2016/06/15/Android%204.0.3%E6%BA%90%E7%A0%81%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%BC%96%E8%AF%91%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/"/>
+      <url>/2016/06/15/Android%204.0.3%E6%BA%90%E7%A0%81%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%BC%96%E8%AF%91%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</url>
+      
+        <content type="html"><![CDATA[<p>一、完全编译说明</p><p>系统：Ubuntu12.04.3-i386</p><p>JDK：jdk-6u29-linux-i586</p><p>源码：iTop4412_ICS</p><p>虚拟机硬件要求：建议2GB内存，交换空间至少4GB（Android4.0以上要求），编译的硬盘空间至少25GB以上。</p><p>首先按照开发版中的说明文档进行编译环境的搭建，在上述运行环境下出现的错误及解决办法说明：</p><p>sudo apt-get install xinetd build-essential nfs-kernel-server apache2 samba git-core gnupg flex bison gperf libsdl-dev libesd0-dev libwxgtk2.6-dev build-essential zip curl libncurses5-dev zlib1g-dev cscope uboot-mkimage</p><p>sudo apt-get install lib32z1-dev</p><p>sudo apt-get install lib32ncurses5-dev</p><p>sudo apt-get install libswitch-perl</p><p>sudo apt-get install git gnupg flex bison gperf build-essential zip curl libc6-dev libncurses5-dev:i386 x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-dri:i386 libgl1-mesa-dev g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc zlib1g-dev:i386 dpkg-dev lib32z1-dev lib32ncurses5-dev libswitch-perl</p><p>1、内核源码编译成功！</p><p>2、Android源码编译问题依次如下：</p><p>1）、make: *** [out/host/linux-x86/obj/EXECUTABLES/obbtool_intermediates/Main.o] Error 1</p><p>此处编译错误是由于ubuntu 11.10采用了GCC4.6.1导致的。</p><p>解决方法：</p><p>修改源码目录下/build/core/combo/HOST_linux-x86.mk文件：</p><p>将以下语句</p><p>HOST_GLOBAL_CFLAGS += -D_FORTIFY_SOURCE=0</p><p>修改为</p><p>HOST_GLOBAL_CFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0</p><p>2)、frameworks/compile/slang/slang_rs_export_foreach.cpp:249:23: 错误： variable ‘ParamName’ set but not used [-Werror=unused-but-set-variable]</p><p>cc1plus: all warnings being treated as errors</p><p>make: *** [out/host/linux-x86/obj/EXECUTABLES/llvm-rs-cc_intermediates/slang_rs_export_foreach.o] 错误 1</p><p>解决办法：</p><p>首先，在工程根目录下，打开下面的makefile文件： $ vi frameworks/compile/slang/Android.mk 其次，在打开的makefile文件中按照下面更改(22行)： local_cflags_for_slang := -Wno-sign-promo -Wall -Wno-unused-parameter -Werror</p><p>修改为 local_cflags_for_slang := -Wno-sign-promo -Wall -Wno-unused-parameter</p><p>3）、[out/host/linux-x86/obj/STATIC_LIBRARIES/libMesa_intermediates/src/glsl/linker.o]</p><p>解决办法：</p><p>$ vi external/mesa3d/src/glsl/linker.cpp 添加： #include <cstddef></cstddef></p><p>4）、[out/host/linux-x86/obj/STATIC_LIBRARIES/liboprofile_pp_intermediates/arrange_profiles.o]</p><p>解决办法：</p><p>$ vim external/oprofile/libpp/format_output.h</p><p>找到 94行，把 mutable 字符串注释掉；</p><p>5）、[out/host/linux-x86/obj/STATIC_LIBRARIES/libgtest_host_intermediates/gtest-all.o]</p><p>解决办法：</p><p>$ vi external/gtest/include/gtest/internal/gtest-param-util.h 添加： #include <cstddef></cstddef></p><p>6）、[out/host/linux-x86/obj/EXECUTABLES/test-librsloader_intermediates/test-librsloader]</p><p>解决办法：</p><p>$vim external/llvm/llvm-host-build.mk</p><p>在文件中插入一行： LOCAL_LDLIBS := -lpthread -ldl</p><p>上述问题解决后，Android源码的编译过程应该能正确通过。</p><p>64Bit补充：</p><p>1）、[out/host/linux-x86/obj/EXECUTABLES/aapt_intermediates/aapt] Error 1</p><p>解决：</p><p>sudo apt-get install lib32z1-dev</p><p>2）、[out/host/linux-x86/obj/EXECUTABLES/adb_intermediates/adb] Error 1</p><p>解决：</p><p>sudo apt-get install lib32ncurses5-dev</p><p>二、源码模块单独编译说明</p><p>在进行下述操作之前，我们需要手工对iTop4412源码进行单独的目标平台配置，拷贝iTop4412/iTop4412_ICS/device/moto/stingray/vendorsetup.sh文件至iTop4412/iTop4412_ICS/device/samsung/smdk4x12/目录下，然后进行修改：</p><p>把</p><p>add_lunch_combo full_stingray-userdebug</p><p>修改为</p><p>add_lunch_combo full_smdk4x12-eng</p><p>最后在源码目录下执行source ./build/envsetup.sh命令进行目标编译项加载，再执行指令lunch选择full_smdk4x12-eng作为编译目标平台，至此配置进行完毕。</p><p>注：在执行source ./build/envsetup.sh命令时有可能提示build/envsetup.sh: 1: Syntax error: “(“ unexpected 错误，解决方法：执行$sudo dpkg-reconfigure dash命令，并选择“否”。</p><p>Google为我们准备了另外的命令来支持编译单独的模块，以及重新打包system.img的命令。</p><p>一. 首先在Android源代码目录下的build目录下，有个脚本文件envsetup.sh，执行这个脚本文件后，就可以获得一些有用的工具：</p><p><strong>USER-NAME@MACHINE-NAME:~/iTop4412_ICS$source ./build/envsetup.sh</strong></p><p>注意，这是一个source命令，执行之后，就会有一些额外的命令可以使用：</p><p><strong>- croot: Changes directory to the top of the tree.</strong></p><p><strong>- m: Makes from the top of the tree.</strong></p><p><strong>- mm: Builds all of the modules in the current directory.</strong></p><p><strong>- mmm: Builds all of the modules in the supplied directories.</strong></p><p><strong>- cgrep: Greps on all local C/C++ files.</strong></p><p><strong>- jgrep: Greps on all local Java files.</strong></p><p><strong>- resgrep: Greps on all local res/*.xml files.</strong></p><p><strong>- godir: Go to the directory containing a file.</strong></p><p>这些命令的具体用法，可以在命令的后面加-help来查看，这里我们只关注mmm命令，也就是可以用它来编译指定目录的所有模块，通常这个目录只包含一个模块。</p><p>二. 使用mmm命令来编译指定的模块，例如Email应用程序：</p><p><strong>USER-NAME@MACHINE-NAME:~/iTop4412_ICS$ mmm packages/apps/Email/</strong></p><p>编译完成之后，就可以在out/target/product/smdk4x12/system/app目录下看到Email.apk文件了。Android 系统自带的App都放在这具目录下。另外，Android系统的一些可执行文件，例如C编译的可执行文件，放在out/target/product/smdk4x12/system/bin目录下，动态链接库文件放在out/target/product/smdk4x12/system/lib目录下，out/target/product/smdk4x12/system/lib/hw目录存放的是硬件抽象层（HAL）接口文件。</p><p>三. 编译好模块后，还要重新打包一下system.img文件，这样我们把system.img运行在模拟器上时，就可以看到我们的程序了。</p><p><strong>USER-NAME@MACHINE-NAME:~/iTop4412_ICS$ make snod</strong></p><p>四. 参照<a href="http://blog.csdn.net/luoshengyang/article/details/6559955" target="_blank" rel="noopener">Ubuntu</a><a href="http://blog.csdn.net/luoshengyang/article/details/6559955" target="_blank" rel="noopener">上下载、编译和安装</a><a href="http://blog.csdn.net/luoshengyang/article/details/6559955" target="_blank" rel="noopener">Android</a><a href="http://blog.csdn.net/luoshengyang/article/details/6559955" target="_blank" rel="noopener">最新源代码</a>一文介绍的方法运行模拟器：</p><p><strong>USER-NAME@MACHINE-NAME:~/iTop4412_ICS$ emulator</strong></p><p>三、单独编译模拟器调试</p><h2 id="make-snod-and-emulator-builds"><a href="#make-snod-and-emulator-builds" class="headerlink" title="make snod and emulator builds."></a>make snod and emulator builds.</h2><p><strong>Symptom</strong>: When using make snod (make system no dependencies) on emulator builds, the resulting build doesn’t work.</p><p><strong>Cause</strong>: All emulator builds now run Dex optimization at build time by default, which requires to follow all dependencies to re-optimize the applications each time the framework changes.</p><p><strong>Fix</strong>: Locally disable Dex optimizations with export WITH_DEXPREOPT=false, delete the existing optimized versions with make installclean and run a full build to re-generate non-optimized versions. After that, make snod will work.</p><h1 id="Stale-ODEX-dependencies-cause-unbootable-Android"><a href="#Stale-ODEX-dependencies-cause-unbootable-Android" class="headerlink" title="Stale ODEX dependencies cause unbootable Android"></a>Stale ODEX dependencies cause unbootable Android</h1><p>This document is based on the code of Android 4.1.1_r6.1 (Jelly Bean).</p><p>Suppose that you want to customiz your android system, you may want to modify /system/framework/framework.jar (source files are in the directory frameworks/base). During development, let’s assume that you just did a full build, and you decide to make some changes to some source files. After that, you want to build again. Ideally, the building system can correctly re-build everything that is dependent on the changes you just made. However, seems that the android building system does not do it properly. You will get an unbootable image caused by <em>mismatched dex signature</em>. If you check the log when system boots, you will see an error message like the following:</p><p>07-30 06:50:56.042: I/dalvikvm(393): DexOpt: mismatch dep signature for ‘/system/framework/framework.odex’ 07-30 06:50:56.042: E/dalvikvm(393): /system/framework/apache-xml.jar odex has stale dependencies</p><p>The reason is that many system apks which was optimized before (ODEX) need to be rebuilt because they are dependent on system framework jar (but they are not). This causes odex mismatch error at bootup which leads to unbootable android in the worst case.</p><p>To solve this problem, you have two options:</p><p>1) Set variable WITH_DEXPREOPT to false in build/target/board/generic/BoardConfig.mk</p><p>2) Add WITH_DEXPREOPT=false when make. It’s like the following:</p><p># make -j4 WITH_DEXPREOPT=false</p><p>上述方法已经测试通过，证明可用于模拟器的源码修改调试，需要注意的是要替换system.img、ramdisk.img、userdata.img三个文件，并重新建立avd模拟器。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Ubuntu14.04LTS更新源</title>
+      <link href="/2016/06/15/Ubuntu14.04LTS%E6%9B%B4%E6%96%B0%E6%BA%90/"/>
+      <url>/2016/06/15/Ubuntu14.04LTS%E6%9B%B4%E6%96%B0%E6%BA%90/</url>
+      
+        <content type="html"><![CDATA[<p>_原文_  <a href="http://www.cnblogs.com/stone-dan-dan/p/4246027.html?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="noopener">http://www.cnblogs.com/stone-dan-dan/p/4246027.html</a> 第一步：备份源列表 sudo cp /etc/apt/sources.list /etc/apt/sources.list_backup</p><h4 id="第二步："><a href="#第二步：" class="headerlink" title="第二步："></a>第二步：</h4><p>打开源列表并进行更改（我用gedit命令）： 此处附上我的源列表（取您所需）： 官方源：</p><p>deb <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty main restricted universe multiverse deb <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-security main restricted universe multiverse deb <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-backports main restricted universe multiverse deb-src <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty main restricted universe multiverse deb-src <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-security main restricted universe multiverse deb-src <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb-src <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb-src <a href="http://archive.ubuntu.com/ubuntu/" target="_blank" rel="noopener">http://archive.ubuntu.com/ubuntu/</a> trusty-backports main restricted universe multiverse deb <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty main restricted universe multiverse</p><p>163源：</p><p>deb <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-security main restricted universe multiverse deb <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-backports main restricted universe multiverse deb-src <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty main restricted universe multiverse deb-src <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-security main restricted universe multiverse deb-src <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb-src <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb-src <a href="http://mirrors.163.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.163.com/ubuntu/</a> trusty-backports main restricted universe multiverse</p><p>阿里源：</p><p>deb <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty main restricted universe multiverse deb <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-security main restricted universe multiverse deb <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-backports main restricted universe multiverse deb-src <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty main restricted universe multiverse deb-src <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-security main restricted universe multiverse deb-src <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb-src <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb-src <a href="http://mirrors.aliyun.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.aliyun.com/ubuntu/</a> trusty-backports main restricted universe multiverse</p><p>centos源（放心使用）：</p><p>deb <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty main restricted universe multiverse deb <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-security main restricted universe multiverse deb <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-updates main restricted universe multiverse deb <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-backports main restricted universe multiverse deb <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-proposed main restricted universe multiverse deb-src <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty main restricted universe multiverse deb-src <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-security main restricted universe multiverse deb-src <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-updates main restricted universe multiverse deb-src <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-backports main restricted universe multiverse deb-src <a href="http://centos.bitcomm.cn/ubuntu" target="_blank" rel="noopener">http://centos.bitcomm.cn/ubuntu</a> trusty-proposed main restricted universe multiverse</p><p>搜狐源：</p><p>deb <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty main restricted universe multiverse deb <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-security main restricted universe multiverse deb <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-backports main restricted universe multiverse deb-src <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty main restricted universe multiverse deb-src <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-security main restricted universe multiverse deb-src <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-updates main restricted universe multiverse deb-src <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-proposed main restricted universe multiverse deb-src <a href="http://mirrors.sohu.com/ubuntu/" target="_blank" rel="noopener">http://mirrors.sohu.com/ubuntu/</a> trusty-backports main restricted universe multiverse</p><p>第三步：选择好你要的源并且复制到你的源列表之后，关闭列表，使用sudo apt-get update命令更新 第四步：sudo apt-get upgrade 提示：如果使用虚拟机可以支持进行复制粘帖这些操作，那么可以进行该操作，如果像我一样使用virtualbox的用户或者是使用的是server版Linux的用户怎么办呢？ 建议：你使用putty进行远程操作，因为你习惯了之后你会发现putty可以进行复制黏贴之类的还有就是省去了老是在虚拟机和真实主机之间的频繁切换的操作。更方便。 最后，附上我参考的地址： <a href="http://wiki.ubuntu.org.cn/Qref/Source" target="_blank" rel="noopener">http://wiki.ubuntu.org.cn/Qref/Source</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>U盘安装Ubuntu Server（转）</title>
+      <link href="/2016/06/15/U%E7%9B%98%E5%AE%89%E8%A3%85Ubuntu%20Server%EF%BC%88%E8%BD%AC%EF%BC%89/"/>
+      <url>/2016/06/15/U%E7%9B%98%E5%AE%89%E8%A3%85Ubuntu%20Server%EF%BC%88%E8%BD%AC%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<p>在网上找了很多教程，都不起效，提示：“从光盘上读取数据出错”。 总结出了几个关键点。 首先，版本，<a href="http://www.centos.bz/category/other-system/ubuntu/" title="Ubuntu" target="_blank" rel="noopener">Ubuntu</a> 12.04 Server，一般的U盘安装都会报：“从光盘上读取数据出错”。如果是桌面版(Desktop)，则可以正常安装。 其次，ISO转化成U盘的安装工具，选择win32diskimager，其他工具都会转化的时候可以正常制作成功，但是在安装过程会报：“从光盘上读取数据出错”。在这两个点上面，我折腾了很久，用了很多尝试方法，包括： 无光驱U盘安装 ubuntu server 12.04.1 跳过光驱检测的方法 完成之后打开U盘目录下的isolinuxsyslinux.cfg，将default vesamenu.c32注释为 # default vesamenu.c32 按了F6后面有启动参数添加栏，在后方输入：install cdrom-detect/try-usb=true 并回车，进入安装 以上这些方法都是坑爹的。 只需要选择win32diskimager制作U盘安装程序，就可以正常安装Ubuntu 12.04 Server。 win32diskimager是一款绿色软件，无需安装。解压后运行exe文件即可，界面如下： <a href="http://www.centos.bz/wp-content/uploads/2013/03/Wdi1.jpg" target="_blank" rel="noopener"><img src="http://www.centos.bz/wp-content/uploads/2013/03/Wdi1.jpg" alt="Wdi1" title="U盘安装 &lt;wbr&gt;Ubuntu &lt;wbr&gt;从光盘上读取数据出错"></a> 文本框用来输入文件完整地址，后面的文件夹图标是浏览窗口，默认只能识别img文件。只需要将iso文件全路径输入在Image File中。 填好镜像的完整地址后右边有个下拉列表用来选择移动设备，千万别选错了！建议只插一个U盘，以免误操作。 之后点击Wirte按钮就开始写入了。写入后重启，从U盘启动就可以进入Ubuntu 12.04 Server安装程序了！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ubuntu </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Opencart网上商店</title>
+      <link href="/2016/06/03/Opencart%E7%BD%91%E4%B8%8A%E5%95%86%E5%BA%97/"/>
+      <url>/2016/06/03/Opencart%E7%BD%91%E4%B8%8A%E5%95%86%E5%BA%97/</url>
+      
+        <content type="html"><![CDATA[<p>基于mycncart搭建的一个网上商店，为个人、商家提供在线商品销售的一站式服务，包括商品展示、购物车、在线支付（微信支付、支付宝支付），提供二次定制开发服务。移动端应用正在开发中，将会陆续上线，敬请期待…</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 服务端开发 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>GMAT客户端</title>
+      <link href="/2016/06/02/GMAT%E5%AE%A2%E6%88%B7%E7%AB%AF/"/>
+      <url>/2016/06/02/GMAT%E5%AE%A2%E6%88%B7%E7%AB%AF/</url>
+      
+        <content type="html"><![CDATA[<p><strong>GMAT客户端收录了关于GMAT考试的语法、逻辑、阅读等各项知识点，为需要进行GMAT考试的学生提供帮助。GMAT是研究生管理科学入学考试的简称；它是国外的一种入学考试。</strong></p><p>[gallery link=”file” columns=”1” size=”large” ids=”74,70,73,72,71”]</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 个人作品 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> app </tag>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>微小果客户端</title>
+      <link href="/2016/06/02/%E5%BE%AE%E5%B0%8F%E6%9E%9C%E5%AE%A2%E6%88%B7%E7%AB%AF/"/>
+      <url>/2016/06/02/%E5%BE%AE%E5%B0%8F%E6%9E%9C%E5%AE%A2%E6%88%B7%E7%AB%AF/</url>
+      
+        <content type="html"><![CDATA[<p><strong>微小果客户端提供各种商品展示、店铺商家入驻、团购优惠等服务。</strong> [gallery link=”file” columns=”1” size=”large” ids=”65,63,64,62,67,66”]</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 个人作品 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> app </tag>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>视频监控应用</title>
+      <link href="/2016/06/02/%E8%A7%86%E9%A2%91%E7%9B%91%E6%8E%A7%E5%BA%94%E7%94%A8/"/>
+      <url>/2016/06/02/%E8%A7%86%E9%A2%91%E7%9B%91%E6%8E%A7%E5%BA%94%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[<p><strong>视频监控应用结合高清摄像头和后台流媒体服务器，能够通过移动设备进行摄像头的实时监控和控制。</strong> [gallery columns=”1” link=”file” size=”large” ids=”51,58,54”]</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 个人作品 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> app </tag>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>善用旁人提醒，减少个人盲点</title>
+      <link href="/2016/06/02/%E5%96%84%E7%94%A8%E6%97%81%E4%BA%BA%E6%8F%90%E9%86%92%EF%BC%8C%E5%87%8F%E5%B0%91%E4%B8%AA%E4%BA%BA%E7%9B%B2%E7%82%B9/"/>
+      <url>/2016/06/02/%E5%96%84%E7%94%A8%E6%97%81%E4%BA%BA%E6%8F%90%E9%86%92%EF%BC%8C%E5%87%8F%E5%B0%91%E4%B8%AA%E4%BA%BA%E7%9B%B2%E7%82%B9/</url>
+      
+        <content type="html"><![CDATA[<p>盲点的存在，大家都知道。但是，「盲点」就是指无法「自我感知」的，才叫「盲点」，必须借助旁人的提醒，才有办法得知，就如「当局者迷，旁观者清」的道理一样。因此，<strong>建立外在（旁人）的「提醒机制」，是减少个人盲点非常重要、且是唯一的方法。</strong>   组织当中因为人员互动频繁，不论是主管、部属或是跨部门的同事间，因彼此的接触频繁较易察觉盲点，原是一个最佳的互相提醒来源；然而，组织中却常常见到少有人愿意主动点醒「当局者」的现象，原因何在？   事实上，大部分的人并不排斥旁人提醒，事后也接受、承认盲点的存在，只是<strong>人易在被提醒的过程中，会不经意浇熄旁人的热情。</strong>比方说，有些人被提醒时神情僵硬，说不出话；有些人则是懊恼不已，表情沮丧；有些人甚至当场面露不悦，并尝试辩解。<strong>听者虽无排斥之意，却因种种瞬间表情，让提醒者以为对方不悦，从而减少主动提醒的意愿，无形中导致提醒机制无从发挥，而这些都是导因于「不习惯被提醒」。</strong>   人从出生到成年，原本已养成「被人提醒」的习惯。婴儿自呱呱落地开始，不论是走路、吃穿、明辨是非，到进入学校学习社会化，都需父母与师长的教导以及随时的提醒，各种生活习惯与规范才会逐渐成形。经常的接受提醒，小孩无形中养成「被提醒的习惯」，被提醒时只会有「对喔，我怎么忘记了」的反应，改正时也极为自然。   「被提醒的习惯」却在叛逆期时出现逆转。叛逆性格较显著的孩子，认为自己应独立自主，面对大人提醒较易排斥；而长辈感受到小孩排拒的态度，为维持良好互动，逐渐减少提醒。进大学后，大学师长则专注专业知识的教授，更少主动指正学生。换言之，<strong>从中学到进入职场此一漫长时间，人已逐渐不习惯外人的提醒。</strong>因此，<strong>若在别人提醒时能以微笑或「怎么没想到」的态度面对，并持续注意一段时间，恢复「被提醒的习惯」，</strong>即能破除提醒者的戒心，表情也会恢复自然，提醒机制也就能回复。   除了习惯问题之外，另一种造成「提醒机制」无法发挥的因素，则是因为太重面子。特别是事事追求完美者，因较他人投注更多的心力于提升完美度，一旦经人指正盲点，在加倍努力反遭质疑的情况下，其当下的情绪反应将更为激烈，更易令提醒者感到退却，进而减少主动的提醒。   不论是习惯或是面子问题，要能激活个人的「提醒机制」，<strong>根源都在于要先有「人不可能完美」这个认知，当他人指正，心态上预留「可能没想到」的空间，</strong>自然而然就能激活旁人持续提醒盲点→盲点愈少→完美度愈高此一善性循环。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 美文收藏 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>能力养成的五个等级</title>
+      <link href="/2016/06/02/%E8%83%BD%E5%8A%9B%E5%85%BB%E6%88%90%E7%9A%84%E4%BA%94%E4%B8%AA%E7%AD%89%E7%BA%A7/"/>
+      <url>/2016/06/02/%E8%83%BD%E5%8A%9B%E5%85%BB%E6%88%90%E7%9A%84%E4%BA%94%E4%B8%AA%E7%AD%89%E7%BA%A7/</url>
+      
+        <content type="html"><![CDATA[<p>在工作或生活当中，我们不断地在学习各种事物或技能，而随着对同一件事物运作得更熟练、了解得更透彻、应用得更广泛，一个人的能力也跟着逐步提升。如果仔细分析一个人在某一领域的学习成长过程，则在不同的成长阶段所反映出来的能力高低，大致可以分为五个等级，我分别称之为：<strong>不会、会、熟、精、通</strong>。 当我们接触到一件新的事物时，因为没有人是天生就会的，所以必定是从「不会」的阶段开始。透过学习，我们知道了基本的方法与步骤，于是学「会」了这件事。「会」的标准其实不高，只要一件事情做得出来就算是「会」，但可能要花太多时间而没有效率，且做出来的质量也可能只有六十分低空飞过，勉强及格。很多事物我们经常只学到这个阶段，如果这是生活中休闲娱乐方面的技能，自然也足够了；但如果是工作上的能力，由于企业竞争讲求的是优劣高下之分，并非及格就好，特别是在竞争激烈的社会里，比别人差一分就居于劣势。因此，能力光是停留在「会」的阶段，显然不足以在职场竞争中留存下来。 学会了一件事物之后，透过反复不断的操作练习，经过一段时间之后，进步到可以把这件事做得很有效率、做得很好，则能够称之为「熟」。也就是说，一个人在能力上达到「熟」的等级，代表着他能够在效率与质量这两方面，同时达到一定标准的要求，对事物的运作与执行滚瓜烂「熟」。一个人的能力到达这个等级时，大抵能在既有的工作岗位上，表现得中规中矩，还算称职。 许多人在某一方面的能力达到「熟」的程度之后，很容易会陷入一个盲点，即认为自己对这件事情已经熟透了，难道这还不够吗？然而，「熟」充其量也只是在依样画葫芦，只不过画得又快又好罢了，但对于事物的了解却不见得透彻，知其然，而不知其所以然，一旦稍有变化，很可能就无从下手。一个人的能力若一直停留于此，往往成为所谓的「万年科员」，数十年如一日地做着同样层级的事；也很可能因为客观环境改变，既有的能力不再有用，而必须从头学习一项新的能力。 「熟」的往上一个等级是「精」，在职场上，唯有达到这个等级的能力，才有资格在一家公司当中，担任基层主管到中级主管的职位。要提升到「精」有一个先决条件，即要对于所从事的工作能够有「深度」的了解。而一个人唯有具备「独立思考」的习惯，并且习惯性地运用「系统性的思考」与「结构性的分析」，才有可能对于事物产生彻底而深度的了解。经由对事物深度的了解，便能够主动、独立地改善事物，具有这样的能力才可称之为「精」。因此，一个人要从「熟」提升到「精」，最重要的一点便是，不仅要知道如何做，还要进一步了解为什么要这样做，藉以掌握每一个运作背后的道理与根源所在，如此才有可能找出当中不够完善之处，加以改善；遇到变化的时候，也能够知道如何因应。 从「精」到「通」，则是一个较为漫长、难度较高的过程。就工作上而言，一个人能力要提升到「通」的等级，必须在同一个领域中，经历过两种类型以上的事物，在「精」于不同类型的事物之后，比较分析不同类型之间的差异，加以去异求同，而在面对此一行业内的其它新事物时，便能够驾轻就熟地因应。一个人的能力提升至此，可称之为「通」，也就是融会贯「通」的意思。 在学习成长的过程中，对于一件事物从「不会」到「会」，再到「熟」，进而提升到「精」、「通」，是一个持续不断的学习过程，即使已经成为某一个领域的专家，也还有更大、更多的领域等着去学习，没有尽头。而每一次等级的提升，都有更多不同的条件必须具备，而非随着时间的进展就能自然地升级；而且，越往高的等级，其升级所需的学习过程也越为漫长。因此，一个人的能力可以提升到哪一个等级？是否会在中途便停止了？端视此人是否清楚认知到此一能力提升的过程与所需条件，以及是否有足够的动力与耐心去学习。 【通】面对新事物能得心应手，成为该领域专家 ↑在同一领域中精于两种以上类型，并进行差异性比较思考与整理分析 【精】能主动独立改善事物 ↑习惯于系统性思考、结构性分析，具有独立判断思考的能力，籍以深度了解事物 【熟】效率很高、品质很好 ↑反复不断地操作练习 【会】做得出来，但效率品质不佳 ↑学习、实践 【不会】</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 美文收藏 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    <entry>
+      <title>Android APK应用加固方案</title>
+      <link href="/2016/06/02/Android%20APK%E5%BA%94%E7%94%A8%E5%8A%A0%E5%9B%BA%E6%96%B9%E6%A1%88/"/>
+      <url>/2016/06/02/Android%20APK%E5%BA%94%E7%94%A8%E5%8A%A0%E5%9B%BA%E6%96%B9%E6%A1%88/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-需求"><a href="#0x00-需求" class="headerlink" title="0x00 需求"></a>0x00 需求</h2><p>应客户需求，针对Android应用进行安全加固，本方案目前实现了防止应用被静态分析，防止二次打包功能。</p><h2 id="0x01-背景"><a href="#0x01-背景" class="headerlink" title="0x01 背景"></a>0x01 背景</h2><p>关于Android加壳的技术分析早几年都已在网上讨论开了，我也是多方参考看学论坛、CSDN等网站，进行了实践测试得出的方案。 APK应用加固如果仅从应用程序包本身去做安全，是不可能做到天衣无缝（毕竟你终究得让系统认得你，能够加载你，最后可以运行你），所以这种方式仅仅是防小白不能轻易的静态分析APK，比如使用apktool，backsmail，jdgui等工具反编译应用。所以市面上的不管是邦邦加固、腾讯加固、爱加密等等，针对APK应用加固也都是为了提高被反编译的难度，不能绝对的保护应用。单从加密机制方面分析，他们做的很多工作都是躲躲藏藏的，当然这在应用加固肯定能够增加一定的混淆性，但不能最终的保护应用免遭破解。 上面也说了，即使你保护的非常好，但是最终运行起来后，仍需要加载到内存中，需要虚拟机识别，这时候数据也就暴露出来了，如果该应用是运行在一台ROOT的手机上，那恭喜你，你的应用已无生还。通过一些工具dump内存就可以找到你的DEX文件，我在看雪论坛中也看到一个帖子叫脱壳神器，也是依赖于定制的Android系统对应用进行脱壳，最终得到DEX文件。</p><h2 id="0x02-思路"><a href="#0x02-思路" class="headerlink" title="0x02 思路"></a>0x02 思路</h2><p>APK应用加固不仅仅是从应用自身去做安全加固，更应结合应用所运行的系统一块去做安全加固。 目前所采用的方案中就是结合咱公司的安全芯片去做APK应用安全加固，通过安全芯片的硬算法去分散密钥加密DEX文件来保证应用的安全性，只有安全芯片的手机才能运行安全加固的应用。 关于APK加壳的技术，相信很多人都非常感兴趣，我也是参考别人文章，然后再分析Android源码最终优化得出来的一种方案。我大致讲一下原理，有不懂的地方请参考相关资料，应用在启动时（即四大组件调用）都会首先启动Application，所以加壳就在这里做，结合APK动态加载技术（这个可以参考谷歌官方代码android-support-multidex.jar）就完成了。</p><h2 id="0x03-PC端加壳实现流程"><a href="#0x03-PC端加壳实现流程" class="headerlink" title="0x03 PC端加壳实现流程"></a>0x03 PC端加壳实现流程</h2><p>开发语言使用JAVA，加上shell脚本进行APK的安全加固。 1、输入文件：已签名的APK应用包 2、使用apktool工具对该APK包进行decode，记住这里不反编译classes.dex，只解析资源文件（如果某些应用无法使用apktool工具解析，则无法进行安全加固，请注意） 3、对AndroidManifest.xml中的Application节点做修改，把android:name修改为解壳使用的XdjaApplication全称，如果应用存在android:name则把该类名称保存为meta-data，供解壳程序使用。 4、把安全加固相关的so文件根据不同平台，拷贝至相应libs目录下； 5、提取出APK中的签名证书，加密后保存至assets目录中； 6、提取目录下的源dex文件，加密后保存至assets目录中； 7、拷贝解壳classes.dex至解压目录下； 8、最后再使用apktool对该目录进行重新打包，得到加固后的APK文件； 9、加固后的APK不带签名，且签名必须使用原签名证书对应的私钥进行签名； 上述操作后，APK已经完成加固功能，可以分别使用公司ACE手机和其它手机做对比测试。</p><h2 id="0x04-解壳实现流程"><a href="#0x04-解壳实现流程" class="headerlink" title="0x04 解壳实现流程"></a>0x04 解壳实现流程</h2><p>1、实现MappleApplication类继承Application，实现attachBaseContext和onCreate接口； 2、attachBaseContext接口中，首先检查应用的签名是否与原签名一致，如果不相同则直接抛出异常；然后参考android-support-multidex.jar源码中加载多dex的方法，把assets中加密的源dex进行解密并加载至当前的ClassLoader中； 3、onCreate接口中，读取AndroidManifest.xml文件，解析meta-data中是否存在应用自定义的Application（参加0x03中第3步），如果存在则实例化该类并调用其onCreate方法。 4、接下来应用就会正常运行起来了。</p><h2 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h2><p>上述已经简单描述了实现流程还有实现关键点，目前APK安全加固只实现了防二次打包、源DEX保护功能，仍有其它安全功能有待实现，如应用资源保护、应用so保护等。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+            <tag> 加壳 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>Android 5.0 Recovery分区还原机制</title>
+      <link href="/2016/06/02/Android%205.0%20Recovery%E5%88%86%E5%8C%BA%E8%BF%98%E5%8E%9F%E6%9C%BA%E5%88%B6/"/>
+      <url>/2016/06/02/Android%205.0%20Recovery%E5%88%86%E5%8C%BA%E8%BF%98%E5%8E%9F%E6%9C%BA%E5%88%B6/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x00-背景"><a href="#0x00-背景" class="headerlink" title="0x00 背景"></a>0x00 背景</h2><p>近段时间在做OTA升级项目中发现，单独对recovery分区刷入新的版本后，启动进入到系统后，再进入recovery模式，会发现recovery被还原为之前的版本，导致校验结果失败。</p><h2 id="0x01-真相"><a href="#0x01-真相" class="headerlink" title="0x01 真相"></a>0x01 真相</h2><p>首先，Andorid编译过程中会生成system/recovery-from-boot.p，该包是由recovery.img与boot.img计算产生的patch包，用于还原recovery分区准备的。 其次，Android编译输出目录下，root目录的init.rc加入如下启动项： service flash_recovery /system/bin/install-recovery.sh class main seclabel u:r:install_recovery:s0 oneshot 我们再来看看这个install-recovery.sh脚本，如下： #!/system/bin/sh if ! applypatch -c EMMC:/dev/block/bootdevice/by-name/recovery:32059648:5ab7bc2f80c9c6f98f444b2ff8e72277ceb7e142; then applypatch -b /system/etc/recovery-resource.dat EMMC:/dev/block/bootdevice/by-name/boot:31394048:34dd9856663d4a11a8eaaafd422e10ce88c03b47 EMMC:/dev/block/bootdevice/by-name/recovery 5ab7bc2f80c9c6f98f444b2ff8e72277ceb7e142 32059648 34dd9856663d4a11a8eaaafd422e10ce88c03b47:/system/recovery-from-boot.p &amp;&amp; log -t recovery “Installing new recovery image: succeeded” || log -t recovery “Installing new recovery image: failed” else log -t recovery “Recovery image already installed” fi</p><h2 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h2><p>通过上述脚本，发现系统每次启动时会判断recovery分区的摘要值是否正确，如果正确则在logcat中打印“Recovery image already installed”，如果不正确，则会执行applypatch命令，首先判断boot分区的摘要值是否正确，如果正确则使用recovery-from-boot.p补丁包进行recovery分区的恢复，恢复成功打印logcat日志”Installing new recovery image: succeeded”，恢复失败则打印”Installing new recovery image: failed”。 通过以上分析，根据具体系统定制的需求，可在编译时把该启动脚本屏蔽掉即可。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 移动端开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> android </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>iPad网上商城</title>
+      <link href="/2016/06/02/iPad%E7%BD%91%E4%B8%8A%E5%95%86%E5%9F%8E/"/>
+      <url>/2016/06/02/iPad%E7%BD%91%E4%B8%8A%E5%95%86%E5%9F%8E/</url>
+      
+        <content type="html"><![CDATA[<p><strong>        iPad网上商城实现了热销商品、限时商品、商品分类、商品比较、商品展示、购物车等功能，能够满足商家在线销售商品的需求。</strong> [gallery columns=”1” size=”large” link=”file” ids=”37,38,48,39,40”]</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 个人作品 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> app </tag>
+            
+            <tag> ios </tag>
+            
+        </tags>
+      
+    </entry>
+    
+  
+  
+</search>
