@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.hndev.cn/"/>
-  <updated>2018-12-08T07:14:12.321Z</updated>
+  <updated>2018-12-08T07:06:30.220Z</updated>
   <id>http://www.hndev.cn/</id>
   
   <author>
@@ -15,62 +15,6 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title></title>
-    <link href="http://www.hndev.cn/2018/12/08/%E5%A6%82%E4%BD%95%E5%9C%A8Mac%20OS%20X%E4%B8%AD%E5%BC%80%E5%90%AF%E6%88%96%E5%85%B3%E9%97%AD%E6%98%BE%E7%A4%BA%E9%9A%90%E8%97%8F%E6%96%87%E4%BB%B6%E5%91%BD%E4%BB%A4/"/>
-    <id>http://www.hndev.cn/2018/12/08/如何在Mac OS X中开启或关闭显示隐藏文件命令/</id>
-    <published>2018-12-08T07:14:12.321Z</published>
-    <updated>2018-12-08T07:14:12.321Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://www.hndev.cn/2018/12/08/U%E7%9B%98%E5%AE%89%E8%A3%85Ubuntu%20Server%EF%BC%88%E8%BD%AC%EF%BC%89/"/>
-    <id>http://www.hndev.cn/2018/12/08/U盘安装Ubuntu Server（转）/</id>
-    <published>2018-12-08T06:49:01.993Z</published>
-    <updated>2018-12-08T06:49:01.993Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://www.hndev.cn/2018/12/08/OpenSSL%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/"/>
-    <id>http://www.hndev.cn/2018/12/08/OpenSSL常用命令/</id>
-    <published>2018-12-08T06:38:52.769Z</published>
-    <updated>2018-12-08T06:38:52.769Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://www.hndev.cn/2018/12/08/Mac%20OS%E4%B8%8B%E4%BA%92%E8%81%94%E7%BD%91%E5%85%B1%E4%BA%AB%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E9%97%AE%E9%A2%98/"/>
-    <id>http://www.hndev.cn/2018/12/08/Mac OS下互联网共享无法连接问题/</id>
-    <published>2018-12-08T06:37:11.065Z</published>
-    <updated>2018-12-08T06:37:11.065Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-  </entry>
   
   <entry>
     <title>单片机开发遇到的坑和填坑办法</title>
@@ -274,7 +218,7 @@
     <link href="http://www.hndev.cn/2017/04/18/%E5%90%84%E7%B1%BB%E6%80%BB%E7%BA%BF%E4%BC%A0%E8%BE%93%E9%80%9F%E7%8E%87%EF%BC%88%E8%BD%AC%EF%BC%89/"/>
     <id>http://www.hndev.cn/2017/04/18/各类总线传输速率（转）/</id>
     <published>2017-04-18T09:26:29.000Z</published>
-    <updated>2018-12-08T07:13:02.925Z</updated>
+    <updated>2018-12-08T07:13:02.947Z</updated>
     
     <content type="html"><![CDATA[<h2 id="1-USB总线"><a href="#1-USB总线" class="headerlink" title="1.USB总线"></a>1.USB总线</h2><p>USB1.1：<br>——-低速模式(low speed)：1.5Mbps<br>——-全速模式(full speed)： 12Mbps<br>USB2.0：<br>向下兼容。增加了高速模式，最大速率480Mbps。<br>——-高速模式(high speed)： 25~480Mbps </p><p>USB3.0：向下兼容。<br>——-super speed ：理论上最高达4.8Gbps，实际中，也就是high speed 的10倍左右。  </p><h2 id="2-UART"><a href="#2-UART" class="headerlink" title="2.UART"></a>2.UART</h2><p>RS232：传输速率一般不超过20Kbps，速率低，抗干扰能力差，RS-232C能传输的最大距离不超过15m（50英尺）。<br>RS422：定义了一种平衡通信接口，将传输速率提高到10Mbps，传输距离延长到4000英尺（速率低于100Kbps时），并允许在一条平衡总线上连接最多10个接收器。<br>RS-422是一种单机发送、多机接收的单向、平衡传输规范，被命名为TIA/EIA-422-A标准。<br>RS485：增加了多点、双向通信能力，即允许多个发送器连接到同一条总线上，同时增加了发送器的驱动能力和冲突保护特性，扩展了总线共模范围，后命名为TIA/EIA-485-A标准。最高传输速率10Mbps，抗干扰能力强，可以传距离1.5km。<br>平衡双绞线的长度与传输速率成反比，在100Kbps速率以下，才可能使用规定最长的电缆长度。只有在很短的距离下才能获得最高速率传输。一般100米长双绞线最大传输速率仅为1Mbps。  </p><h2 id="3-SPI总线"><a href="#3-SPI总线" class="headerlink" title="3.SPI总线"></a>3.SPI总线</h2><p>全双工通信，传输速率可达几Mbps水平，比I2C快。  </p><h2 id="4-I2C总线"><a href="#4-I2C总线" class="headerlink" title="4.I2C总线"></a>4.I2C总线</h2><p>半双工，只有2根线。数据线和时钟线。<br>——–标准速度：100kbps<br>——–快速模式：400kbps<br>——–高速模式：3.4Mbps  </p><h2 id="4-Ethernet，也就是通常的网速。"><a href="#4-Ethernet，也就是通常的网速。" class="headerlink" title="4.Ethernet，也就是通常的网速。"></a>4.Ethernet，也就是通常的网速。</h2><p>——–早期的以太网传输速率只有10Mbps。<br>——–百兆网：理论上最大100Mbps。<br>——–千兆网：理论上最大1Gbps。  </p><h2 id="5-SD总线：最高能达10Mbps。"><a href="#5-SD总线：最高能达10Mbps。" class="headerlink" title="5.SD总线：最高能达10Mbps。"></a>5.SD总线：最高能达10Mbps。</h2><h2 id="6-SATA接口："><a href="#6-SATA接口：" class="headerlink" title="6.SATA接口："></a>6.SATA接口：</h2><p>——–SATA1.0：理论传输速度是150MB/s（或者1.5Gb/s），实际也就30MBps。<br>——–SATA2.0： 300MBps，即3Gbps。实际也就80MBps。<br>——–SATA3.0： 600MBps，即6Gbps。<br>——–eSATA：理论传输速度可达到1.5Gbps或3Gbps。  </p><h2 id="7-PCI总线"><a href="#7-PCI总线" class="headerlink" title="7.PCI总线"></a>7.PCI总线</h2><p>——–PCI：32位，33MHz时钟频率，速率是33*4 = 133MBps，即1Gbps。<br>——–PCI 2.1：64位，66MHz时钟频率来说：速率是66*8 = 528MBps，即4Gbps。  </p><h2 id="8-PCI-e："><a href="#8-PCI-e：" class="headerlink" title="8.PCI-e："></a>8.PCI-e：</h2><p>PCI Express 总线频率 2500 MHz，这是在 100 MHz 的基准频率通过锁相环振荡器(Phase Lock Loop，PLL)达到的。<br>串行总线带宽(MB/s) = 串行总线时钟频率(MHz) <em> 串行总线位宽(bit/8 = B) </em> 串行总线管线 <em> 编码方式 </em> 每时钟传输几组数据(cycle)<br>——PCI Express x1 总线位宽是 1位，总线频率 2500 MHz，串行总线管线是 1 条，每时钟传输 2组数据，编码方式为 8b/10b，它的带宽为 476.84 MB/s，即 3814.7 Mbps。（带宽是 PCI 的 3.75 倍。）<br>公式是 2500000000(Hz) <em> 1/8(bit) </em> 1(条管线) <em> 8/10(bit) </em> 2(每时钟传输2组数据) = 500000000 B/s = 476.8371582 MB/s，即 3814.6972656 Mbps。<br>下面给出其它类型组合的带宽。<br>——PCI Express x2 的带宽为 953.68 MB/s，即 7629.4 Mbps。（此模式仅用于主板内部接口而非插槽模式）<br>——PCI Express x4 的带宽为 1907.36 MB/s，即 15258.9 Mbps。<br>——PCI Express x8 的带宽为 3814.72 MB/s，即 30517.8 Mbps。<br>——PCI Express x16 的带宽为 7629.44 MB/s，即 61035.5 Mbps。（带宽是 AGP 8X 的 3.75 倍。）<br>——PCI Express x32 的带宽为 15258.88 MB/s，即 122071 Mbps。</p><h2 id="9-XGMII-XLGMII-CGMII"><a href="#9-XGMII-XLGMII-CGMII" class="headerlink" title="9.XGMII/XLGMII/CGMII"></a>9.XGMII/XLGMII/CGMII</h2><p>在以太网标准中，MAC层与PHY层之间的10Gbps/40Gbps/100Gbps速率等级所对应的接口分别为XGMII/XLGMII/CGMII，由于XGMII/XLGMII是并行总线，而且采用的是单端信号，HSTL电平，最大传输距离只有7cm。所以在实际应用中，XGMII/XLGMII基本上被XAUI/XLAUI替代。XAUI/XLAUI是四通道串行总线，采用的差分信号，CML逻辑传输，并且进行了扰码，大大增强了信号的抗扰性能，使得信号的有效传输距离增加到50cm。<br>XAUI/XLAUI在物理结构上是一样的，收发通道独立，各四对差分信号线。对于XAUI总线，每对差分线上的数据速率为3.125Gbps，总数据带宽为12.5Gbps，有效带宽为12.5Gbps*0.8=10Gbps （因为XAUI总线数据在传输前进行了8B/10B变换，编码效率为80%）。<br>对于XLAUI总线，每对差分线上的数据速率为10.3125Gbps，总数据带宽为41.25Gbps，有效带宽为41.25Gbps*(64/66)=40Gbps（因为XLAUI总线数据在传输前进行了64B/66B变换，编码效率为96.97%）。</p>]]></content>
     
@@ -425,6 +369,32 @@
   </entry>
   
   <entry>
+    <title>Mac OS下互联网共享无法连接问题</title>
+    <link href="http://www.hndev.cn/2017/02/20/Mac%20OS%E4%B8%8B%E4%BA%92%E8%81%94%E7%BD%91%E5%85%B1%E4%BA%AB%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E9%97%AE%E9%A2%98/"/>
+    <id>http://www.hndev.cn/2017/02/20/Mac OS下互联网共享无法连接问题/</id>
+    <published>2017-02-20T07:57:18.000Z</published>
+    <updated>2018-12-08T06:37:11.086Z</updated>
+    
+    <content type="html"><![CDATA[<p>这个问题折腾我好久了，今天终于解决了，如果你也遇到请试试下列方法： </p><h3 id="1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，要求修改很简单的字母，如Maple；"><a href="#1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，要求修改很简单的字母，如Maple；" class="headerlink" title="1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，要求修改很简单的字母，如Maple；"></a>1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，要求修改很简单的字母，如Maple；</h3><h3 id="2、如果你已经开启共享网络，请先关闭；"><a href="#2、如果你已经开启共享网络，请先关闭；" class="headerlink" title="2、如果你已经开启共享网络，请先关闭；"></a>2、如果你已经开启共享网络，请先关闭；</h3><h3 id="3、进入“系统偏好设置”-》“安全性与隐私”，选择“防火墙”，关闭防火墙。"><a href="#3、进入“系统偏好设置”-》“安全性与隐私”，选择“防火墙”，关闭防火墙。" class="headerlink" title="3、进入“系统偏好设置”-》“安全性与隐私”，选择“防火墙”，关闭防火墙。"></a>3、进入“系统偏好设置”-》“安全性与隐私”，选择“防火墙”，关闭防火墙。</h3><h3 id="4、删除以下文件："><a href="#4、删除以下文件：" class="headerlink" title="4、删除以下文件："></a>4、删除以下文件：</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/Library/Preferences/SystemConfiguration/com<span class="selector-class">.apple</span><span class="selector-class">.nat</span><span class="selector-class">.plist</span></span><br><span class="line">/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist</span><br><span class="line">/Library/Preferences/SystemConfiguration/com<span class="selector-class">.apple</span><span class="selector-class">.airport</span><span class="selector-class">.preferences</span><span class="selector-class">.plist</span></span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;这个问题折腾我好久了，今天终于解决了，如果你也遇到请试试下列方法： &lt;/p&gt;
+&lt;h3 id=&quot;1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，要求修改很简单的字母，如Maple；&quot;&gt;&lt;a href=&quot;#1、首先进入“系统偏好设置”-》“共享”，修改你的电脑名称，
+      
+    
+    </summary>
+    
+      <category term="操作系统" scheme="http://www.hndev.cn/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"/>
+    
+    
+      <category term="mac os" scheme="http://www.hndev.cn/tags/mac-os/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Cordova插件自定义iOS版</title>
     <link href="http://www.hndev.cn/2017/02/19/Cordova%E6%8F%92%E4%BB%B6%E8%87%AA%E5%AE%9A%E4%B9%89iOS%E7%89%88/"/>
     <id>http://www.hndev.cn/2017/02/19/Cordova插件自定义iOS版/</id>
@@ -472,6 +442,82 @@
     
     
       <category term="ionic" scheme="http://www.hndev.cn/tags/ionic/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>iOS开发小记</title>
+    <link href="http://www.hndev.cn/2016/12/12/iOS%E5%BC%80%E5%8F%91%E5%B0%8F%E8%AE%B0/"/>
+    <id>http://www.hndev.cn/2016/12/12/iOS开发小记/</id>
+    <published>2016-12-12T12:22:20.000Z</published>
+    <updated>2018-12-08T05:45:57.133Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="20150808"><a href="#20150808" class="headerlink" title="20150808 "></a>20150808 </h2><p>在使用nib加载view时，千万注意锚定功能合理选择，不然将会导致不可预知的高度缩放问题，因为iOS7以上版本，页面在加载时一般会进行一次缩放，这样它同时会对里面的控件也进行相应的缩放操作，谨记！</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;20150808&quot;&gt;&lt;a href=&quot;#20150808&quot; class=&quot;headerlink&quot; title=&quot;20150808 &quot;&gt;&lt;/a&gt;20150808 &lt;/h2&gt;&lt;p&gt;在使用nib加载view时，千万注意锚定功能合理选择，不然将会导致不可预知的高度缩放问题
+      
+    
+    </summary>
+    
+      <category term="移动端开发" scheme="http://www.hndev.cn/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BC%80%E5%8F%91/"/>
+    
+    
+      <category term="ios" scheme="http://www.hndev.cn/tags/ios/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>iOS UIScroll的一个BUG</title>
+    <link href="http://www.hndev.cn/2016/12/12/iOS%20UIScroll%E7%9A%84%E4%B8%80%E4%B8%AABUG/"/>
+    <id>http://www.hndev.cn/2016/12/12/iOS UIScroll的一个BUG/</id>
+    <published>2016-12-12T12:18:01.000Z</published>
+    <updated>2018-12-08T05:42:18.208Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>之前发现了个UIScroll的BUG，让我郁闷半天，就是当继承该类时，如果使用init方法初始化，其将依次调用initWithFrame和init。真的很让人费解。</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;strong&gt;之前发现了个UIScroll的BUG，让我郁闷半天，就是当继承该类时，如果使用init方法初始化，其将依次调用initWithFrame和init。真的很让人费解。&lt;/strong&gt;&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+      <category term="移动端开发" scheme="http://www.hndev.cn/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BC%80%E5%8F%91/"/>
+    
+    
+      <category term="ios" scheme="http://www.hndev.cn/tags/ios/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android驱动设备节点自动创建</title>
+    <link href="http://www.hndev.cn/2016/10/19/Android%E9%A9%B1%E5%8A%A8%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9%E8%87%AA%E5%8A%A8%E5%88%9B%E5%BB%BA/"/>
+    <id>http://www.hndev.cn/2016/10/19/Android驱动设备节点自动创建/</id>
+    <published>2016-10-19T03:08:15.000Z</published>
+    <updated>2018-12-08T04:52:51.695Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="x00-背景"><a href="#x00-背景" class="headerlink" title="x00 背景"></a>x00 背景</h2><p>最近帮同事解决一个问题，就是在Ubuntu（主机）下编译的USB驱动程序，在设备热插拔的时候会自动创建设备节点，但是该驱动程序移植到Android系统下，则需要手动创建节点，该节点还需要手工配置DAC和MAC安全策略，对于实际使用中非常麻烦；</p><h2 id="0x01-问题分析及解决"><a href="#0x01-问题分析及解决" class="headerlink" title="0x01 问题分析及解决"></a>0x01 问题分析及解决</h2><p>参见文章《<a href="http://blog.chinaunix.net/uid-24545924-id-3128349.html" target="_blank" rel="noopener">Android Uevent 分析，从kernel到framework</a> 》 我们知道Android上层的uevent事件使用了自个的一套实现，接下来我们开发分析代码，源码文件：system/core/init/devices.c<br><figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><span class="line">static void handle\_generic\_device_event(struct uevent *uevent)</span><br><span class="line">&#123;</span><br><span class="line">    char *base;</span><br><span class="line">    const char *<span class="keyword">name</span>;</span><br><span class="line">    char devpath\[DEVPATH_LEN\] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    char **links = NULL;</span><br><span class="line"></span><br><span class="line">    INFO(<span class="string">"lwz usb: generic\_device\_event start\\n"</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">name</span> = parse\_device\_<span class="keyword">name</span>(uevent, <span class="number">64</span>);</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">name</span>)</span><br><span class="line">        return;</span><br><span class="line">    <span class="comment">//打印收到的热插拔事件信息</span></span><br><span class="line">    INFO(<span class="string">"maple usb1: device\_name:%s, major:%d, minor:%d, action:%s name:%s\\n"</span>,  <span class="function"><span class="title">uevent</span>-&gt;</span><span class="function"><span class="title">device</span>\_name, uevent-&gt;</span><span class="function"><span class="title">major</span>, uevent-&gt;</span><span class="function"><span class="title">minor</span>, uevent-&gt;</span>action, <span class="keyword">name</span>);</span><br><span class="line">    struct ueventd_subsystem *subsystem =</span><br><span class="line">            <span class="function"><span class="title">ueventd</span>\_subsystem\_find\_by\_name(uevent-&gt;</span>subsystem);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (subsystem) &#123;</span><br><span class="line">        const char *devname;</span><br><span class="line">        <span class="function"><span class="title">switch</span> (subsystem-&gt;</span>devname_src) &#123;</span><br><span class="line">        case DEVNAME\_UEVENT\_DEVNAME:</span><br><span class="line">            <span class="function"><span class="title">devname</span> = uevent-&gt;</span>device_name;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        case DEVNAME\_UEVENT\_DEVPATH:</span><br><span class="line">            devname = <span class="keyword">name</span>;</span><br><span class="line">            break;</span><br><span class="line"></span><br><span class="line">        default:</span><br><span class="line">            ERROR(<span class="string">"%s subsystem's devpath option is not set; ignoring event\\n"</span>,</span><br><span class="line">                    <span class="function"><span class="title">uevent</span>-&gt;</span>subsystem);</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="title">if</span> (!assemble_devpath(devpath, subsystem-&gt;</span>dirname, devname))</span><br><span class="line">            return;</span><br><span class="line">        mkdir\_recursive\_for_devpath(devpath);</span><br><span class="line">    &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"usb"</span>, <span class="number">3</span>)) &#123;</span><br><span class="line">         <span class="function"><span class="title">if</span> (!strcmp(uevent-&gt;</span>subsystem, <span class="string">"usb"</span>)) &#123;</span><br><span class="line">            <span class="function"><span class="title">if</span> (uevent-&gt;</span>device_name) &#123;</span><br><span class="line">                <span class="function"><span class="title">if</span> (!assemble\_devpath(devpath, "/dev", uevent-&gt;</span>device\_<span class="keyword">name</span>))</span><br><span class="line">                    return;</span><br><span class="line">                mkdir\_recursive\_for_devpath(devpath);</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">else</span> &#123;</span><br><span class="line">                 /\* This imitates the file system that would be created</span><br><span class="line">                  \* <span class="keyword">if</span> we were using devfs instead.</span><br><span class="line">                  \* Minors are broken up into groups of <span class="number">128</span>, starting <span class="built_in">at</span> <span class="string">"001"</span></span><br><span class="line">                  */</span><br><span class="line">                 <span class="function"><span class="title">int</span> bus_id = uevent-&gt;</span>minor / <span class="number">128</span> + <span class="number">1</span>;</span><br><span class="line">                 <span class="function"><span class="title">int</span> device_id = uevent-&gt;</span>minor % <span class="number">128</span> + <span class="number">1</span>;</span><br><span class="line">                 /\* build directories */</span><br><span class="line">                 make_dir(<span class="string">"/dev/bus"</span>, <span class="number">0755</span>);</span><br><span class="line">                 make_dir(<span class="string">"/dev/bus/usb"</span>, <span class="number">0755</span>);</span><br><span class="line">                 snprintf(devpath, sizeof(devpath), <span class="string">"/dev/bus/usb/%03d"</span>, bus_id);</span><br><span class="line">                 make_dir(devpath, <span class="number">0755</span>);</span><br><span class="line">                 snprintf(devpath, sizeof(devpath), <span class="string">"/dev/bus/usb/%03d/%03d"</span>, bus\_id, device\_id);</span><br><span class="line">             &#125;</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             /\* ignore other USB events */</span><br><span class="line">             <span class="comment">//忽略一些不符合上述条件的USB事件，并返回</span></span><br><span class="line">        INFO(<span class="string">"maple usb: ignore other USB events\\n"</span>);</span><br><span class="line">             <span class="comment">//我这里是通过判断创建的节点名称是否是我们想要的，如果是则继续往下执行进行节点的创建和移除操作</span></span><br><span class="line">         <span class="function"><span class="title">if</span>(!strncmp(uevent-&gt;</span>device_name, <span class="string">"myusb"</span>, <span class="number">5</span>)) &#123;</span><br><span class="line">        base = <span class="string">"/dev/"</span>;</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">else</span></span><br><span class="line">             return;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"graphics"</span>, <span class="number">8</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/graphics/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"drm"</span>, <span class="number">3</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/dri/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"oncrpc"</span>, <span class="number">6</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/oncrpc/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"adsp"</span>, <span class="number">4</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/adsp/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"msm_camera"</span>, <span class="number">10</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/msm_camera/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span>(!strncmp(uevent-&gt;</span>subsystem, <span class="string">"input"</span>, <span class="number">5</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/input/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span>(!strncmp(uevent-&gt;</span>subsystem, <span class="string">"mtd"</span>, <span class="number">3</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/mtd/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span>(!strncmp(uevent-&gt;</span>subsystem, <span class="string">"sound"</span>, <span class="number">5</span>)) &#123;</span><br><span class="line">         base = <span class="string">"/dev/snd/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span>(!strncmp(uevent-&gt;</span>subsystem, <span class="string">"misc"</span>, <span class="number">4</span>) &amp;&amp;</span><br><span class="line">                 !strncmp(<span class="keyword">name</span>, <span class="string">"log_"</span>, <span class="number">4</span>)) &#123;</span><br><span class="line">         kernel_logger();</span><br><span class="line">         base = <span class="string">"/dev/log/"</span>;</span><br><span class="line">         make_dir(base, <span class="number">0755</span>);</span><br><span class="line">         <span class="keyword">name</span> += <span class="number">4</span>;</span><br><span class="line">     &#125; <span class="function"><span class="title">else</span> <span class="keyword">if</span> (!strncmp(uevent-&gt;</span>subsystem, <span class="string">"dvb"</span>, <span class="number">3</span>)) &#123;</span><br><span class="line">         /\* This imitates the file system that would be created</span><br><span class="line">          \* <span class="keyword">if</span> we were using devfs instead to preserve backward compatibility</span><br><span class="line">          \* <span class="keyword">for</span> users of dvb devices</span><br><span class="line">          */</span><br><span class="line">         int adapter_id;</span><br><span class="line">         char dev_name\[<span class="number">20</span>\] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">         sscanf(<span class="keyword">name</span>, <span class="string">"dvb%d.%s"</span>, &amp;adapter\_id, dev\_<span class="keyword">name</span>);</span><br><span class="line"></span><br><span class="line">         /\* build dvb directory */</span><br><span class="line">         base = <span class="string">"/dev/dvb"</span>;</span><br><span class="line">         mkdir(base, <span class="number">0755</span>);</span><br><span class="line"></span><br><span class="line">         /\* build adapter directory */</span><br><span class="line">         snprintf(devpath, sizeof(devpath), <span class="string">"/dev/dvb/adapter%d"</span>, adapter_id);</span><br><span class="line">         mkdir(devpath, <span class="number">0755</span>);</span><br><span class="line"></span><br><span class="line">         /\* build actual device directory */</span><br><span class="line">         snprintf(devpath, sizeof(devpath), <span class="string">"/dev/dvb/adapter%d/%s"</span>,</span><br><span class="line">                  adapter\_id, dev\_<span class="keyword">name</span>);</span><br><span class="line">     &#125; <span class="keyword">else</span></span><br><span class="line">         base = <span class="string">"/dev/"</span>;</span><br><span class="line">     links = get\_character\_device_symlinks(uevent);</span><br><span class="line">     <span class="keyword">if</span> (!links)</span><br><span class="line">         links = get\_v4l\_device_symlinks(uevent);</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (!devpath\[<span class="number">0</span>\])</span><br><span class="line">         snprintf(devpath, sizeof(devpath), <span class="string">"%s%s"</span>, base, <span class="keyword">name</span>);</span><br><span class="line">    <span class="comment">//开始进行热插拔处理，包括设备节点的创建和移除，可参考相关代码继续分析</span></span><br><span class="line">    INFO(<span class="string">"maple usb: devpath %s, major:%d, minor:%d, action:%s\\n"</span>, <span class="function"><span class="title">devpath</span>, uevent-&gt;</span><span class="function"><span class="title">major</span>, uevent-&gt;</span><span class="function"><span class="title">minor</span>, uevent-&gt;</span>action);</span><br><span class="line">     <span class="function"><span class="title">handle_device</span>(uevent-&gt;</span><span class="function"><span class="title">action</span>, devpath, uevent-&gt;</span><span class="built_in">path</span>, <span class="number">0</span>,</span><br><span class="line">             <span class="function"><span class="title">uevent</span>-&gt;</span><span class="function"><span class="title">major</span>, uevent-&gt;</span>minor, links);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;x00-背景&quot;&gt;&lt;a href=&quot;#x00-背景&quot; class=&quot;headerlink&quot; title=&quot;x00 背景&quot;&gt;&lt;/a&gt;x00 背景&lt;/h2&gt;&lt;p&gt;最近帮同事解决一个问题，就是在Ubuntu（主机）下编译的USB驱动程序，在设备热插拔的时候会自动创建设备节
+      
+    
+    </summary>
+    
+      <category term="移动端开发" scheme="http://www.hndev.cn/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BC%80%E5%8F%91/"/>
+    
+    
+      <category term="android" scheme="http://www.hndev.cn/tags/android/"/>
     
   </entry>
   
